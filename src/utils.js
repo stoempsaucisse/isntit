@@ -69,21 +69,3 @@ export function mergeData (to, from) {
 export function ucfirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
-/**
- * Printf clone.
- * Use %{varName} wher 'varName' is a key in `replacements`
- */
-export function printf(str, replacements) {
-    var replacements = replacements;
-    return str.replace(/\%\{([\w\d_\.]+)\}/g, function(match, placeholder){
-        return replacements[placeholder];
-    });
-}
-
-export function compareNumbers(val1, comparator, val2) {
-    if (!hasOwn(this.config.comparators, comparator)) {
-        warn(`'${comparator}' cannot be used as comparition operator. Returning false by default.`);
-        return false;
-    }
-    return this.config.comparators[comparator].fun(val1, val2);
-}

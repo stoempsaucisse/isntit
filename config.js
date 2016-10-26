@@ -25,7 +25,7 @@ const builds = {
     alias: {
       he: './entity-decoder'
     }
-  }/*,
+  },
   'web-standalone-prod': {
     entry: path.resolve(__dirname, './src/index.js'),
     dest: path.resolve(__dirname, './isntit.min.js'),
