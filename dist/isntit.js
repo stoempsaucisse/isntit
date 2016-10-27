@@ -1,6 +1,215 @@
-import { config } from './config'
-import { warn } from './debug'
-import { hasOwn, ucfirst } from './utils'
+/*!
+ * Isntit - a simple javascript validation library
+ * version: 0.0.2
+ * (c) 2016 stoempsaucisse
+ * Released under the MIT License.
+ */
+
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global.Isntit = factory());
+}(this, (function () { 'use strict';
+
+/**
+ * Default configuration (for production).
+ */
+var config = {
+    bitMasks: {
+        string: 1,
+        number: 2,
+        'boolean': 4,
+        'null': 8,
+        date: 16,
+        regexp: 32,
+        array: 64,
+        set: 128,
+        object: 256,
+        rest: (1 << 30)
+    },
+    checkersSteps: ['before', 'during'],
+    confirmationRE: /(.+)_confirmation$/,
+    comparators: {
+        '==': function(val1, val2) {
+            return (val1 == val2);
+        },
+        '===': function(val1, val2) {
+            return (val1 === val2);
+        },
+        '!=': function(val1, val2) {
+            return (val1 != val2);
+        },
+        '!==': function(val1, val2) {
+            return (val1 !== val2);
+        },
+        '>': function(val1, val2) {
+            return (val1 > val2);
+        },
+        '>=': function(val1, val2) {
+            return (val1 >= val2);
+        },
+        '<': function(val1, val2) {
+            return (val1 < val2);
+        },
+        '<=': function(val1, val2) {
+            return (val1 <= val2);
+        },
+        // Aliasses
+        get equalTo(){ 
+            delete this.equalTo;
+            return this.equalTo = this['=='];
+        },
+        get notEqualTo(){ 
+            delete this.notEqualTo;
+            return this.notEqualTo = this['!='];
+        },
+        get greaterThan(){ 
+            delete this.greaterThan;
+            return this.greaterThan = this['>'];
+        },
+        get greaterThanOrEqualTo(){ 
+            delete this.greaterThanOrEqualTo;
+            return this.greaterThanOrEqualTo = this['>='];
+        },
+        get lessThan(){ 
+            delete this.lessThan;
+            return this.lessThan = this['<'];
+        },
+        get lessThanOrEqualTo(){ 
+            delete this.lessThanOrEqualTo;
+            return this.lessThanOrEqualTo = this['<='];
+        }
+    },
+    /**
+     * Many thanks to Jan Goyvaerts for his email regular expression
+     * @url : http://www.regular-expressions.info/email.html
+     */
+    emailRE: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+    emptyStringRE: /^[\s\t\n\r]+$/,
+    emptyValues: [null, undefined, 'undefined'],
+    equalityComparators: [
+        '==', '===', '!=', '!==', 'equalTo', 'notEqualTo'
+    ],
+    messages: {
+        confirms: "should be sames as %{field}",
+        required: "is required",
+        email: "is not a valid email",
+        format: "",
+        length: function() {
+            var context = this;
+            var rule = context.ruleSet['length'];
+            if(rule.is) {
+                return 'must be exactly %{is} characters long';
+            }
+            if(rule.min && rule.max) {
+                return 'must be between %{min} and %{max} characters long';
+            }
+            if(rule.min) {
+                return 'must be minimum %{min} characters long';
+            }
+            if(rule.max) {
+                return 'must be maximum %{min} characters long';
+            }
+        },
+        numeric: {
+            onlyInteger: 'must be an integer',
+            noStrings: 'strings are not allowed',
+            equalTo: 'must be equal to %{equalTo}',
+            notEqualTo: 'must not be equal to %{notEqualTo}',
+            greaterThan: 'must be greater than %{greaterThan}',
+            greaterThanOrEqualTo: 'must be greater than or equal to %{greaterThanOrEqualTo}',
+            lessThan: 'must be less than %{lessThan}',
+            lessThanOrEqualTo: 'must be less than or equal to %{lessThanOrEqualTo}'
+        },
+        notValid: "is not valid."
+    },
+    noLabelChar: "^"
+};
+
+var warn = noop;
+{
+    var hasConsole = typeof console !== 'undefined';
+    warn = function(msg, obj) {
+        if (hasConsole && (!config.silent)) {
+            if (obj) {
+                console.error(("[Isntit warn]: " + msg), obj);
+            } else {
+                console.error(("[Isntit warn]: " + msg));
+            }
+        }
+    };
+}
+
+/**
+ * Perform no operation.
+ */
+function noop() {}
+
+/**
+ * Always return false.
+ */
+
+
+/**
+ * Check whether the object has the property.
+ */
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+function hasOwn (obj, key) {
+    return hasOwnProperty.call(obj, key);
+}
+
+/**
+ * Set a property on an object. Adds the new property and
+ * triggers change notification if the property doesn't
+ * already exist.
+ */
+function set (obj, key, val) {
+    if (Array.isArray(obj)) {
+        obj.splice(key, 1, val);
+        return val
+    }
+    if (hasOwn(obj, key)) {
+        obj[key] = val;
+        return
+    }
+    return val
+}
+
+/**
+ * Quick object check - this is primarily used to tell
+ * Objects from primitive values when we know the value
+ * is a JSON-compliant type.
+ */
+function isObject (obj) {
+  return obj !== null && typeof obj === 'object'
+}
+
+/**
+ * Helper that recursively merges two data objects together.
+ * Data from `to` has priority on data from `from`
+ * If you want to override data from `from` to `to`,
+ * please use `Object.assign(to, from);`
+ */
+function mergeData (to, from) {
+    var key, toVal, fromVal;
+    for (key in from) {
+        toVal = to[key];
+        fromVal = from[key];
+        if (! hasOwn(to, key)) {
+            set(to, key, fromVal);
+        } else if (isObject(toVal) && isObject(fromVal)) {
+            mergeData(toVal, fromVal, override);
+        }
+    }
+    return to;
+}
+
+/**
+ * Set first character to upercase
+ */
+function ucfirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 var defaultOptions = {
     /**
@@ -10,7 +219,7 @@ var defaultOptions = {
     /**
      * Whether to enable devtools.
      */
-    devtools: process.env.NODE_ENV !== 'production',
+    devtools: "development" !== 'production',
     /**
      * Whether to prefix erro messages with the field name.
      */
@@ -19,7 +228,7 @@ var defaultOptions = {
      * Whether to capitalize error messages.
      */
     capitalize: true
-}
+};
 
 
 // Get the error message
@@ -38,13 +247,13 @@ var _getMsg = function(context, ruleName, ruleProperty) {
     return (typeof message === 'function') ?
         message.call(context) :
         message;
-}
+};
 
-function Isntit(rules, options) {
+function Isntit$1(rules, options) {
     // called as function
-    if (!(this instanceof Isntit)) {
+    if (!(this instanceof Isntit$1)) {
         warn('`Isntit([rules [, options]])` is a constructor and should be called with the `new` keyword.');
-        return new Isntit(rules, options);
+        return new Isntit$1(rules, options);
     }
     this.options = Object.assign(defaultOptions, options || {});
     this.rules = rules || {};
@@ -52,10 +261,10 @@ function Isntit(rules, options) {
     this.errors = {};
 }
 
-Isntit.prototype.currentContext = {};
-Isntit.prototype.config = config;
+Isntit$1.prototype.currentContext = {};
+Isntit$1.prototype.config = config;
 
-Isntit.prototype.checkers = {
+Isntit$1.prototype.checkers = {
     before: {
         confirms: {
             validate: function(value, context) {
@@ -75,7 +284,7 @@ Isntit.prototype.checkers = {
         required: {
             validate: function(value, context) {
                 var I = this;
-                if (Isntit.isEmpty(value)) {
+                if (Isntit$1.isEmpty(value)) {
                     return _getMsg.call(I, context, 'required');
                 }
                 return true;
@@ -85,7 +294,7 @@ Isntit.prototype.checkers = {
     during: {
         email: {
             validate: function(value, context){
-                Isntit.isString(value);
+                Isntit$1.isString(value);
                 var I = this;
                 if (!config.emailRE.test(value)) {
                     return _getMsg.call(I, context, 'email');
@@ -95,7 +304,7 @@ Isntit.prototype.checkers = {
         },
         format: {
             validate: function(value, context) {
-                Isntit.isOfType(['string', 'number'], value);
+                Isntit$1.isOfType(['string', 'number'], value);
                 var I = this;
                 var ruleSet = context.ruleSet;
                 var RE = (ruleSet.format instanceof RegExp) ? ruleSet.format : ruleSet.format.pattern;
@@ -107,7 +316,7 @@ Isntit.prototype.checkers = {
         },
         length: {
             validate: function(value, context) {
-                Isntit.isOfType(['string', 'number', 'array'], value);
+                Isntit$1.isOfType(['string', 'number', 'array'], value);
                 var I = this;
                 var messages = [];
                 var result = true;
@@ -142,7 +351,7 @@ Isntit.prototype.checkers = {
         },
         numeric: {
             validate: function(value, context) {
-                Isntit.isOfType(['string', 'number'], value);
+                Isntit$1.isOfType(['string', 'number'], value);
                 var I = this;
                 var messages = [];
                 var numeric = context.ruleSet['numeric'];
@@ -183,7 +392,7 @@ Isntit.prototype.checkers = {
             }
         }
     }
-}
+};
 // Global API
 
 
@@ -253,7 +462,7 @@ Isntit.prototype.checkers = {
 // }
 
 // Get a bit mask for object
-Isntit.getTypeBit = function(obj) {
+Isntit$1.getTypeBit = function(obj) {
     switch (typeof obj) {
         case 'string':
             return config.bitMasks['string'];
@@ -282,10 +491,10 @@ Isntit.getTypeBit = function(obj) {
         default:
             return config.bitMasks['rest'];
     }
-}
+};
 
 // Check if a value is empty
-Isntit.isEmpty = function(value) {
+Isntit$1.isEmpty = function(value) {
     var typeOf = typeof value;
     if ((typeOf === 'string' || typeOf === 'array') && value.length === 0) {
         return true;
@@ -302,52 +511,54 @@ Isntit.isEmpty = function(value) {
         }
     }
     return false;
-}
+};
 
-Isntit.isOfType = function(types, value, warns) {
+Isntit$1.isOfType = function(types, value, warns) {
     warns = (typeof warns === 'undefined')? true : warns;
-    if (Isntit.getTypeBit(types) === config.bitMasks['array']) {
+    if (Isntit$1.getTypeBit(types) === config.bitMasks['array']) {
         var res = false;
         types.forEach(function(type) {
-            res = res || Isntit.isOfType(type, value, false);
+            res = res || Isntit$1.isOfType(type, value, false);
         });
         types = types.join(', ');
     } else {
-        var res = Isntit.getTypeBit(value) === config.bitMasks[types];
+        var res = Isntit$1.getTypeBit(value) === config.bitMasks[types];
     }
     if (!res && warns) {
-        warn(`Value is not of type ${types}, given: ${typeof value}`);
+        warn(("Value is not of type " + types + ", given: " + (typeof value)));
     }
     return res;
-}
+};
 
-Isntit.isNumber = function(value, warns) {
-    return Isntit.isOfType('number', value, warns);
-}
+Isntit$1.isNumber = function(value, warns) {
+    return Isntit$1.isOfType('number', value, warns);
+};
 
-Isntit.isString = function(value, warns) {
-    return Isntit.isOfType('string', value, warns);
-}
+Isntit$1.isString = function(value, warns) {
+    return Isntit$1.isOfType('string', value, warns);
+};
 
 /**
  * Printf 'clone'.
  * Use %{varName} in string with 'varName' as key in the `replacements` object
  */
-Isntit.printf = function(str, replacements) {
+Isntit$1.printf = function(str, replacements) {
     var replacements = replacements;
     return str.replace(/\%\{([\w\d_\.]+)\}/g, function(match, placeholder){
         if (typeof replacements[placeholder] != 'undefined') {
             return replacements[placeholder];
         }
-        warn(`There is no replacement for ${match} in ${str}`, replacements);
+        warn(("There is no replacement for " + match + " in " + str), replacements);
         return match;
     });
-}
+};
 
 // Instance methods
 
 // Validate
-Isntit.prototype.validate = function(data, rules) {
+Isntit$1.prototype.validate = function(data, rules) {
+    var this$1 = this;
+
     var rules = rules || this.rules;
     this.errors = {};
     // Looping on fields in data
@@ -363,7 +574,7 @@ Isntit.prototype.validate = function(data, rules) {
                         confirms: {
                             field: matches[1]
                         }
-                    }
+                    };
                 }
             }
             // Looping through checkers steps
@@ -382,12 +593,12 @@ Isntit.prototype.validate = function(data, rules) {
                         step: step
                     };
                     // Select the right checker
-                    var checker = this.checkers[step][ruleName];
+                    var checker = this$1.checkers[step][ruleName];
                     if (typeof checker !== 'undefined') {
-                        var message = checker.validate.call(this, value, context);
+                        var message = checker.validate.call(this$1, value, context);
                         if (message !== true) {
-                            if (!hasOwn(this.errors, fieldName)) {
-                                this.errors[fieldName] = [];
+                            if (!hasOwn(this$1.errors, fieldName)) {
+                                this$1.errors[fieldName] = [];
                             }
                             // Prepare replacements for parsing
                             var replacements = {
@@ -399,7 +610,7 @@ Isntit.prototype.validate = function(data, rules) {
                             Object.assign(replacements, context.ruleSet[ruleName]);
                             // Should the message be prepended with %{label}
                             var noPrepend = message.charAt(0) === config.noLabelChar;
-                            var fullMessage = rules[fieldName][ruleName]['fullMessage'] || this.options.fullMessages;
+                            var fullMessage = rules[fieldName][ruleName]['fullMessage'] || this$1.options.fullMessages;
                             if (fullMessage && !noPrepend) {
                                 message = '%{label} ' + message;
                             }
@@ -407,41 +618,43 @@ Isntit.prototype.validate = function(data, rules) {
                                 message = message.substr(1);
                             }
                             // Parse message
-                            message = Isntit.printf(message, replacements);
+                            message = Isntit$1.printf(message, replacements);
                             // Should the message be prepended capitalized
-                            var capitalize = rules[fieldName][ruleName]['capitalize'] || this.options.capitalize;
+                            var capitalize = rules[fieldName][ruleName]['capitalize'] || this$1.options.capitalize;
                             if (capitalize) {
                                 message = ucfirst(message);
                             }
                             // Set message in errors array
-                            this.errors[fieldName].push(message);
+                            this$1.errors[fieldName].push(message);
                         }
                     }
                 }
-                if (typeof this.errors[fieldName] !== 'undefined') {
+                if (typeof this$1.errors[fieldName] !== 'undefined') {
                     break;
                 }
             }
         }
     }
     return this.errors;
-}
+};
 // Comparing stuff
-Isntit.prototype.compare = function(val1, comparator, val2) {
+Isntit$1.prototype.compare = function(val1, comparator, val2) {
     if (!hasOwn(config.comparators, comparator)) {
         warn("Unknown comparator: " + comparator);
     }
-    if (Isntit.getTypeBit(val1) !== Isntit.getTypeBit(val2)) {
-        warn(`You are comparing values with different types: ${val1} and ${val2}`);
+    if (Isntit$1.getTypeBit(val1) !== Isntit$1.getTypeBit(val2)) {
+        warn(("You are comparing values with different types: " + val1 + " and " + val2));
     }
     return this.config.comparators[comparator](val1, val2);
-}
+};
 
-Isntit.prototype.getMessages = function() {
+Isntit$1.prototype.getMessages = function() {
     return this.errors;
-}
+};
 
-Isntit.prototype.registerChecker = function(checker, name, step, checkersSteps) {
+Isntit$1.prototype.registerChecker = function(checker, name, step, checkersSteps) {
+    var this$1 = this;
+
     if (typeof checker !== 'function' && !hasOwn(checker, 'validate')) {
         if (arguments.length > 3) {
             warn('Instance methode registerChecker() signature is:\n(object[, step[, checkersSteps]]), supplemental arguments will be ignored.', Array.from(arguments));
@@ -451,11 +664,11 @@ Isntit.prototype.registerChecker = function(checker, name, step, checkersSteps) 
             if(config.checkersSteps.indexOf(key) !== -1) {
                 step = key;
                 for(var name in checker[step]) {
-                    this.registerChecker(checker[step][name], name, step, checkersSteps);
+                    this$1.registerChecker(checker[step][name], name, step, checkersSteps);
                 }
             } else {
                 step = name;
-                this.registerChecker(checker[key], key, step, checkersSteps);
+                this$1.registerChecker(checker[key], key, step, checkersSteps);
             }
         }
     } else {
@@ -477,6 +690,10 @@ Isntit.prototype.registerChecker = function(checker, name, step, checkersSteps) 
             };
         }
     }
-}
+};
 
-export default Isntit;
+/*  */
+
+return Isntit$1;
+
+})));

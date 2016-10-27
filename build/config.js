@@ -3,13 +3,15 @@ const flow = require('rollup-plugin-flow-no-whitespace')
 const buble = require('rollup-plugin-buble')
 const replace = require('rollup-plugin-replace')
 const alias = require('rollup-plugin-alias')
-const version = process.env.VERSION || require('./package.json').version
+const version = process.env.VERSION || require('../package.json').version
+const firstYear = 2016;
+const year = new Date().getFullYear();
 
 const banner =
   '/*!\n' +
   ' * Isntit - a simple javascript validation library\n' +
   ' * version: ' + version + '\n' +
-  ' * (c) 2016-' + new Date().getFullYear() + ' stoempsaucisse\n' +
+  ' * (c) ' + firstYear + ((firstYear == year)? '' : '-' + year) + ' stoempsaucisse\n' +
   ' * Released under the MIT License.\n' +
   ' */\n'
 
@@ -17,8 +19,8 @@ const banner =
 
 const builds = {
   'web-standalone-dev': {
-    entry: path.resolve(__dirname, './src/index.js'),
-    dest: path.resolve(__dirname, './isntit.js'),
+    entry: path.resolve(__dirname, '../src/index.js'),
+    dest: path.resolve(__dirname, '../dist/isntit.js'),
     format: 'umd',
     env: 'development',
     banner,
@@ -27,8 +29,8 @@ const builds = {
     }
   },
   'web-standalone-prod': {
-    entry: path.resolve(__dirname, './src/index.js'),
-    dest: path.resolve(__dirname, './isntit.min.js'),
+    entry: path.resolve(__dirname, '../src/index.js'),
+    dest: path.resolve(__dirname, '../dist/isntit.min.js'),
     format: 'umd',
     env: 'production',
     banner,

@@ -10,7 +10,7 @@ const uglify = require('uglify-js')
 // }
 
 // Update main file
-const version = process.env.VERSION || require('./package.json').version
+const version = process.env.VERSION || require('../package.json').version
 // const main = fs
 //   .readFileSync('src/core/index.js', 'utf-8')
 //   .replace(/Vue\.version = '[^']+'/, "Vue.version = '" + version + "'")
