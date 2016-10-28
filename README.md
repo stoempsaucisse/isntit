@@ -59,10 +59,7 @@ var results = I.validate({
 
 
 ###### Isntit.getTypeBit(obj: any): number
-<<<<<<< HEAD
 
-=======
->>>>>>> 8c0a24902d67a8078994badf10f4bd5ed806b400
 Return an integer representing the `obj` type. Types are:
 
 * string
@@ -111,21 +108,21 @@ var rules = {
 
 Where:
 
-    * fieldName: corresponding key in data.
-    * checkerName: the checker to use. Value is either a boolean or an object with `checkerProperty: value` pairs.
-    * checkerProperty: boolean or supplemental arguments for the checker. Use `message` to customize the error message with a string, a function returning a string or an object with `checkerProperty: string|()` pairs. Start the message string with "^" (customize with `config.noLabelChar: string`) to prevent the message from being prefixed with the field name, even when `options.fullMessages: boolean`. Use `fullMessage: boolean` to customize on checker level prefixing with field name.
+* fieldName: corresponding key in data.
+* checkerName: the checker to use. Value is either a boolean or an object with `checkerProperty: value` pairs.
+* checkerProperty: boolean or supplemental arguments for the checker. Use `message` to customize the error message with a string, a function returning a string or an object with `checkerProperty: string|()` pairs. Start the message string with "^" (customize with `config.noLabelChar: string`) to prevent the message from being prefixed with the field name, even when `options.fullMessages: boolean`. Use `fullMessage: boolean` to customize on checker level prefixing with field name.
 
 Checkers:
 
-    * "before" checkers:
-        * required: field must be non empty (using Isntit.isEmpty()).
-        * confirms: field value must be the same as the value of the field with `field: fieldName` checkerProperty. Isntit is smart enough to link field names like `password_confirmation: boolean` and `password: {checkerProperty: any}` (use `config.confirmationRE: RegExp` to customize this behaviour).
+* "before" checkers:
+    * required: field must be non empty (using Isntit.isEmpty()).
+    * confirms: field value must be the same as the value of the field with `field: fieldName` checkerProperty. Isntit is smart enough to link field names like `password_confirmation: boolean` and `password: {checkerProperty: any}` (use `config.confirmationRE: RegExp` to customize this behaviour).
 
-    * "during" checkers:
-        * email: self explanatory.
-        * format: field is tested against `pattern: RegExp`
-        * length: field must be longer than `min: value` and/or shorter than `max: value`, or exactly `is: value` long.
-        * numeric: field must comply with `comparatorName: string` (see I.compare()), `onlyInteger: boolean` and `noStrings: boolean`.
+* "during" checkers:
+    * email: self explanatory.
+    * format: field is tested against `pattern: RegExp`
+    * length: field must be longer than `min: value` and/or shorter than `max: value`, or exactly `is: value` long.
+    * numeric: field must comply with `comparatorName: string` (see I.compare()), `onlyInteger: boolean` and `noStrings: boolean`.
 
 ###### I.compare(value1: string | number, comparator: ComparatorType, value2: string | number, strict: boolean): boolean
 
@@ -149,12 +146,9 @@ Extend `config.comparators: (val1: any, comparator: ComparatorType|string , val2
 Returns the errors from last validation.
 
 ###### I.registerChecker(checker: {}[, step: string[, checkerSteps: Array<string>]]): void
-<<<<<<< HEAD
 
 or
 
-=======
->>>>>>> 8c0a24902d67a8078994badf10f4bd5ed806b400
 ###### I.registerChecker(checkerFunction: (value: any, context: {}), checkerName: string[, step: string[, checkerSteps: Array<string>]]): void
 
 The checkerFunction is called with the value to check as argument and the current context as `this`. The optional step argument is the validation step to which register your checker to (default is "during"). You may create an new step which is pushed at the end of the steps list. The optional checkerSteps array lets you re-order and hide existing and new steps.
