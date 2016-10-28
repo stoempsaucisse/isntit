@@ -23,9 +23,11 @@ Features
 Usage
 ---
 ### Getting started
+
 ```html
 <script src="dist/isntit.min.js" type="text/javascript"></script>
 ```
+
 ```js
 var options = {
     fullMessages: true // Prepends all error messages with the field name
@@ -50,13 +52,16 @@ var results = I.validate({
     "user.firstname": "stoempsaucisse"
 });
 ```
+
 ### Reference
 
 #### Global API
 
 
-###### Isntit.getTypeBit(obj)
+###### Isntit.getTypeBit(obj: any): number
+
 Return an integer representing the `obj` type. Types are:
+
 * string
 * number
 * boolean
@@ -87,8 +92,10 @@ Returns `string` with %{placeholder} replaced with value of `replacements[placeh
 
 ###### I.validate(data: {}[, rules: {}]): {}
 Core business of Isntit. Validates fields in data against rules. By default the rules provided during instanciation are used. To override those default rules, provide the optional rule argument.
+
 * `data`: an object of `fieldName: value` pairs with the key
 * `rules`:
+
 ```js
 var rules = {
     fieldName: {
@@ -98,14 +105,19 @@ var rules = {
     }
 }
 ```
+
 Where:
+
     * fieldName: corresponding key in data.
     * checkerName: the checker to use. Value is either a boolean or an object with `checkerProperty: value` pairs.
     * checkerProperty: boolean or supplemental arguments for the checker. Use `message` to customize the error message with a string, a function returning a string or an object with `checkerProperty: string|()` pairs. Start the message string with "^" (customize with `config.noLabelChar: string`) to prevent the message from being prefixed with the field name, even when `options.fullMessages: boolean`. Use `fullMessage: boolean` to customize on checker level prefixing with field name.
+
 Checkers:
+
     * "before" checkers:
         * required: field must be non empty (using Isntit.isEmpty()).
         * confirms: field value must be the same as the value of the field with `field: fieldName` checkerProperty. Isntit is smart enough to link field names like `password_confirmation: boolean` and `password: {checkerProperty: any}` (use `config.confirmationRE: RegExp` to customize this behaviour).
+
     * "during" checkers:
         * email: self explanatory.
         * format: field is tested against `pattern: RegExp`
@@ -113,7 +125,9 @@ Checkers:
         * numeric: field must comply with `comparatorName: string` (see I.compare()), `onlyInteger: boolean` and `noStrings: boolean`.
 
 ###### I.compare(value1: string | number, comparator: ComparatorType, value2: string | number, strict: boolean): boolean
+
 Compares two values with the given comparator. Both values should have same "type" (see `Isntit.getTypeBit()`). Comparators have default Javascript behavior and are:
+
 ```js
 type ComparatorType =
         | '==' or 'equalTo'
@@ -131,11 +145,11 @@ Extend `config.comparators: (val1: any, comparator: ComparatorType|string , val2
 ###### I.getMessages(): {: string}
 Returns the errors from last validation.
 
-###### I.registerChecker(): void
-Register checkers using one of two signatures:
+###### I.registerChecker(checker: {}[, step: string[, checkerSteps: Array<string>]]): void
 
-    * I.registerChecker(checker: {}[, step: string[, checkerSteps: Array<string>]]): void where object is a collection of `checkerName: checkerFunction` pairs.
-    * I.registerChecker(checkerFunction: (value: any, context: {}), checkerName: string[, step: string[, checkerSteps: Array<string>]]): void
+or
+
+###### I.registerChecker(checkerFunction: (value: any, context: {}), checkerName: string[, step: string[, checkerSteps: Array<string>]]): void
 
 The checkerFunction is called with the value to check as argument and the current context as `this`. The optional step argument is the validation step to which register your checker to (default is "during"). You may create an new step which is pushed at the end of the steps list. The optional checkerSteps array lets you re-order and hide existing and new steps.
 
