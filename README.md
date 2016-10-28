@@ -59,7 +59,10 @@ var results = I.validate({
 
 
 ###### Isntit.getTypeBit(obj: any): number
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8c0a24902d67a8078994badf10f4bd5ed806b400
 Return an integer representing the `obj` type. Types are:
 
 * string
@@ -146,9 +149,12 @@ Extend `config.comparators: (val1: any, comparator: ComparatorType|string , val2
 Returns the errors from last validation.
 
 ###### I.registerChecker(checker: {}[, step: string[, checkerSteps: Array<string>]]): void
+<<<<<<< HEAD
 
 or
 
+=======
+>>>>>>> 8c0a24902d67a8078994badf10f4bd5ed806b400
 ###### I.registerChecker(checkerFunction: (value: any, context: {}), checkerName: string[, step: string[, checkerSteps: Array<string>]]): void
 
 The checkerFunction is called with the value to check as argument and the current context as `this`. The optional step argument is the validation step to which register your checker to (default is "during"). You may create an new step which is pushed at the end of the steps list. The optional checkerSteps array lets you re-order and hide existing and new steps.
