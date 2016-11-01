@@ -439,6 +439,9 @@ Isntit$1.isEmpty = function(value) {
 // Printf 'clone'.
 Isntit$1.printf = printf;
 
+// ucfirst.
+Isntit$1.ucfirst = ucfirst;
+
 // Instance methods
 function _setError(context, fieldName, ruleName, constraint) {
     var I = this;
