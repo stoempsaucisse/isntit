@@ -21,9 +21,11 @@ Example
 ```js
 var options = {
     capitalize: true,                       // capitalize error messages
-    devtools: config.env !== 'production',  // activate devtools
+    devtools: config.env !== 'production',  // activate devtools (! disabled in production files)
     fullMessages: true,                     // prepend messages with the field name
-    silent: false                           // prevent warnings even with devtools
+    config: {                               // override config
+        silent: false                       // prevent warnings even with devtools
+    }
 };
 
 var rules = {
@@ -40,7 +42,7 @@ var rules = {
         }
     },
     user.age: {
-        required: false,                    // warns about a rule with false
+        required: false,                    // Isntit warns about and skip a rule with false
         length: {
             min: 3
         }
@@ -59,7 +61,7 @@ var results = I.validate({
 Installation
 ---
 ### Standalone
-Simply grab [*isntit.js*](https://raw.githubusercontent.com/stoempsaucisse/isntit/master/dist/isntit.js) or [*isntit.min.js*](https://raw.githubusercontent.com/stoempsaucisse/isntit/master/dist/isntit.min.js) and serve it.
+Simply grab [*isntit.js*](https://raw.githubusercontent.com/stoempsaucisse/isntit/master/dist/isntit.js) (for development) or [*isntit.min.js*](https://raw.githubusercontent.com/stoempsaucisse/isntit/master/dist/isntit.min.js) (for production) and serve it.
 
 ### NPM
 1. `git clone git@github.com:stoempsaucisse/isntit.git`
@@ -69,45 +71,35 @@ Simply grab [*isntit.js*](https://raw.githubusercontent.com/stoempsaucisse/isnti
 
 Features
 ---
+* devtools: get usefull warnings during runtime (only enabled in development files)
 * extendable: register your own data checker
 * use steps to prioritize some checkers upon others (if a step fails, checkers in following steps are not called)
-* provide usefull helpers like `Isntit.printf(string: string, replacements: Array<any>)`
+* helpers: `Isntit.printf(string: string, replacements: Array<any>)` or `Isntit.isEmpty(value: any)`
 
 Usage
 ---
 
 #### Global API
 
-
-###### Isntit.getTypeBit(obj: any): number
-
-Return an integer representing the `obj` type. Types are:
-
-* string
-* number
-* boolean
-* null
-* date
-* regexp
-* array (includes new Map())
-* set
-* object
-* all others
-
 ###### Isntit.isEmpty(obj: any): boolean
 Check if a given object is empty. Uses `config.emptyStringRE: RegExp` and `config.emptyValues: any`.
 
-###### Isntit.isOfType(types: string | array, value: any, warns: boolean): boolean
-Check if a given `value` is of given `types` (string or array of strings, cfr. `Isntit.getTypeBit()`). Use `warns` to toggle warnings about result.
+###### Isntit.getCheckers(): {: object}
+Returns the all checkers (including new registered).
 
-###### Isntit.isNumber(value: any, warns: boolean): boolean
-Wrapper for `Isntit.isOfType('number', value, warns)`.
+###### Isntit.registerChecker(checker: {}[, step: string[, checkerSteps: Array<string>]]): void
 
-###### Isntit.isString(value: any, warns: boolean): boolean
-Wrapper for `Isntit.isOfType('string', value, warns)`.
+or
+
+###### Isntit.registerChecker(checkerFunction: (value: any, context: {}), checkerName: string[, step: string[, checkerSteps: Array<string>]]): void
+
+The checkerFunction is called with the value to check as argument and the current context as `this`. The optional step argument is the validation step to which register your checker to (default is "during"). You may create an new step which is pushed at the end of the steps list. The optional checkerSteps array lets you re-order and/or hide existing and new steps.
 
 ###### Isntit.printf(string: string, replacements: Array<string>): string
 Returns `string` with %{placeholder} replaced with value of `replacements[placeholder]`.
+
+###### Isntit.ucfirst(string: string): string
+Returns `string` with first character UPPERCASED.
 
 #### Instance methods
 
@@ -145,34 +137,14 @@ Checkers:
     * length: field must be longer than `min: value` and/or shorter than `max: value`, or exactly `is: value` long.
     * numeric: field must comply with `comparatorName: string` (see I.compare()), `onlyInteger: boolean` and `noStrings: boolean`.
 
-###### I.compare(value1: string | number, comparator: ComparatorType, value2: string | number, strict: boolean): boolean
-
-Compares two values with the given comparator. Both values should have same "type" (see `Isntit.getTypeBit()`). Comparators have default Javascript behavior and are:
-
-```js
-type ComparatorType =
-        | '==' or 'equalTo'
-        | '==='
-        | '!=' or 'notEqualTo'
-        | '!=='
-        | '>' or 'greaterThan'
-        | '>=' or 'greaterThanOrEqualTo'
-        | '<' or 'lessThan'
-        | '<=' or 'lessThanOrEqualTo';
-```
-
-Extend `config.comparators: (val1: any, comparator: ComparatorType|string , val2: any)` to support other type comparison and use them from within your customized checker.
+###### I.getCheckers(): {: object}
+Wrapper to `Isntit.getCheckers(): {: object}`.
 
 ###### I.getMessages(): {: string}
 Returns the errors from last validation.
 
-###### I.registerChecker(checker: {}[, step: string[, checkerSteps: Array<string>]]): void
-
-or
-
-###### I.registerChecker(checkerFunction: (value: any, context: {}), checkerName: string[, step: string[, checkerSteps: Array<string>]]): void
-
-The checkerFunction is called with the value to check as argument and the current context as `this`. The optional step argument is the validation step to which register your checker to (default is "during"). You may create an new step which is pushed at the end of the steps list. The optional checkerSteps array lets you re-order and hide existing and new steps.
+###### I.getStep(checkerName: string): {: string}
+Returns the step in which the checker with given checkerName is called.
 
 Many thanks to:
 ---
