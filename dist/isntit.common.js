@@ -5,17 +5,13 @@
  * Released under the MIT License.
  */
 
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (global.Isntit = factory());
-}(this, (function () { 'use strict';
+'use strict';
 
 /**
  * Default configuration (for production).
  */
 var config = {
-    env: "development",
+    env: process.env.NODE_ENV,
     silent: false,
     checkersSteps: ['before', 'during'],
     confirmationRE: /(.+)_confirmation$/,
@@ -118,7 +114,7 @@ var config = {
 /**
  * Perform no operation.
  */
-function noop$1() {}
+function noop() {}
 
 /**
  * Always return false.
@@ -179,15 +175,7 @@ function mergeData (to, from) {
     return to;
 }
 
-function swap (json) {
-    var ret = {};
-    for(var key in json) {
-        ret[json[key]] = key;
-    }
-    return ret;
-}
-
-var warn = noop$1;
+var warn = noop;
 /* eslint-disable no-console */
 if ( config.env !== 'production') {
     var hasConsole = typeof console !== 'undefined';
@@ -223,11 +211,11 @@ function ucfirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function Isntit$2(rules, options) {
+function Isntit$1(rules, options) {
     // called as function
-    if (!(this instanceof Isntit$2)) {
+    if (!(this instanceof Isntit$1)) {
         warn('`Isntit([rules [, options]])` is a constructor and should be called with the `new` keyword.');
-        return new Isntit$2(rules, options);
+        return new Isntit$1(rules, options);
     }
     if (options && options.config) {
         Object.assign(config, options.config);
@@ -244,7 +232,7 @@ function Isntit$2(rules, options) {
     this.errors = {};
 }
 
-Isntit$2.prototype.options = {
+Isntit$1.prototype.options = {
     /**
      * Whether to capitalize error messages.
      */
@@ -274,7 +262,7 @@ var checkers = {
         },
         required: {
             validate: function(value) {
-                return !Isntit$2.isEmpty(value);
+                return !Isntit$1.isEmpty(value);
             },
             types: 'boolean'
         }
@@ -384,12 +372,12 @@ var checkers = {
 // Global API
 
 // Get checkers
-Isntit$2.getCheckers = function() {
+Isntit$1.getCheckers = function() {
     return checkers;
 };
 
 // Add checker(s)
-Isntit$2.registerChecker = function(checker, name, step, checkersSteps) {
+Isntit$1.registerChecker = function(checker, name, step, checkersSteps) {
     var I = this;
     if (typeof checker !== 'function' && !hasOwn(checker, 'validate')) {
         if (arguments.length > 3) {
@@ -429,7 +417,7 @@ Isntit$2.registerChecker = function(checker, name, step, checkersSteps) {
 };
 
 // Check if a value is empty
-Isntit$2.isEmpty = function(value) {
+Isntit$1.isEmpty = function(value) {
     var typeOf = typeof value;
     if ((typeOf === 'string' || typeOf === 'array') && value.length === 0) {
         return true;
@@ -449,7 +437,7 @@ Isntit$2.isEmpty = function(value) {
 };
 
 // Printf 'clone'.
-Isntit$2.printf = printf;
+Isntit$1.printf = printf;
 
 // Instance methods
 function _setError(context, fieldName, ruleName, constraint) {
@@ -590,7 +578,7 @@ function _loopThroughCheckers(value, fieldName, data, rules) {
 }
 
 // Validate
-Isntit$2.prototype.validate = function(data, rules) {
+Isntit$1.prototype.validate = function(data, rules) {
     var I = this;
     if (rules) {
         I.checkRules(rules);
@@ -617,18 +605,18 @@ Isntit$2.prototype.validate = function(data, rules) {
             _loopThroughCheckers.call(I, value, fieldName, data, rules);
         }
     }
-    return (Isntit$2.isEmpty(I.errors)) ? true : I.errors;
+    return (Isntit$1.isEmpty(I.errors)) ? true : I.errors;
 };
 
-Isntit$2.prototype.getCheckers = function() {
+Isntit$1.prototype.getCheckers = function() {
     return checkers;
 };
 
-Isntit$2.prototype.getMessages = function() {
+Isntit$1.prototype.getMessages = function() {
     return this.errors;
 };
 
-Isntit$2.prototype.getStep = function(ruleName) {
+Isntit$1.prototype.getStep = function(ruleName) {
     var I = this;
     if (!I.cache.checkersToStep[ruleName]) {
         for (var i = 0; i < config.checkersSteps.length; i++) {
@@ -645,199 +633,6 @@ Isntit$2.prototype.getStep = function(ruleName) {
     return I.cache.checkersToStep[ruleName];
 };
 
-Isntit$2.version = '0.0.3';
+Isntit$1.version = '0.0.3';
 
-var typeBits = {
-    'undefined': 1,
-    string: 2,
-    number: 4,
-    'boolean': 8,
-    'function': 16,
-    // typeof == 'object' variations
-    'null': 32,
-    date: 64,
-    regexp: 128,
-    array: 256,
-    set: 512,
-    object: 1024,
-    // anything else ?
-    rest: (1 << 30)
-};
-
-var swaped = swap(typeBits);
-
-function getTypeBit(obj) {
-    switch (typeof obj) {
-        case 'undefined':
-            return typeBits['undefined'];
-        case 'string':
-            return typeBits['string'];
-        case 'number':
-            return typeBits['number'];
-        case 'boolean':
-            return typeBits['boolean'];
-        case 'function':
-            return typeBits['function'];
-        case 'object':
-            switch (true) {
-                case (obj === null):
-                    return typeBits['null'];
-                case (obj instanceof Date):
-                    return typeBits['date'];
-                case (obj instanceof RegExp):
-                    return typeBits['regexp'];
-                case (obj instanceof Array):
-                case (obj instanceof Map):
-                case (obj instanceof WeakMap):
-                    return typeBits['array'];
-                case (obj instanceof Set):
-                case (obj instanceof WeakSet):
-                    return typeBits['set'];
-                default:
-                    return typeBits['object'];
-            }
-        default:
-            return typeBits['rest'];
-    }
-}
-
-
-
-function getType(obj) {
-    return swaped[getTypeBit(obj)];
-}
-
-function checkType(object, rule) {
-    var result = true;
-    var res;
-    var typeofRule = typeof rule;
-    if (typeofRule === 'string') {
-        result = (getType(object) === rule);
-    } else if(rule instanceof Array) {
-        res = false;
-        for (var i = 0; i < rule.length; i++) {
-            if ((rule[i] instanceof Array) && (object instanceof Array)) {
-                var rres = 0;
-                for (var j = 0; j < object.length; j++) {
-                    if (!checkType(object[j], rule[i])) {
-                        rres += 1;
-                    }
-                }
-                res = res || !rres;
-            } else {
-                res = res || checkType(object, rule[i]);
-            }
-        }
-        result = res;
-    } else if (typeofRule === 'function') {
-        result = rule(object);
-    } else if (rule !== null && typeofRule === 'object') {
-        if (object !== null && typeof object !== 'object') {
-            return false;
-        }
-        res = 0;
-        for(var key in object) {
-            var allOrRuleOrOther = rule['__all'] || rule[key] || rule['__others'];
-            if (typeof rule !== 'undefined') {
-                if (!checkType(object[key], allOrRuleOrOther)) {
-                    res += 1;
-                }
-            }
-        }
-        result = !res;
-    } else {
-        warn("Oops, unknown case in checktype(). Args: ", object, rule);
-    }
-    return result;
-}
-
-function isOfType(types, value, warns) {
-    warns = (typeof warns === 'undefined')? true : warns;
-    var res = false;
-    if (getTypeBit(types) === typeBits['array']) {
-        types.forEach(function(type) {
-            res = res || isOfType(type, value, false);
-        });
-        types = types.join(', ');
-    } else {
-        res = getTypeBit(value) === typeBits[types];
-    }
-    if (!res && warns) {
-        warn(("Value is not of type " + types + ", given: " + (typeof value)));
-    }
-    return res;
-}
-
-var messageTypes = [
-    'string',
-    'function',
-    {
-        __all: ['string', 'function']
-    }
-];
-
-function _pushMessageTypes(obj) {
-    if (!hasOwn(obj, 'message')) {
-        obj['message'] = messageTypes;
-        if (hasOwn(obj, '__all')) {
-            obj['__others'] = obj['__all'];
-            delete obj['__all'];
-        }
-    }
-    return obj;
-}
-
-function _addDefaultTypes(constraints) {
-    switch(true) {
-        case typeof constraints === 'string':
-            constraints = [constraints, { message: messageTypes }];
-            break;
-        case constraints instanceof Array:
-            var found = false;
-            for (var i = 0; i < constraints.length; i++) {
-                if (isObject(constraints[i])) {
-                    constraints[i] = _pushMessageTypes(constraints[i]);
-                    found = true;
-                    break;
-                } else if (typeof constraints[i] === 'function') {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                constraints.push({ message: messageTypes });
-            }
-            break;
-        case (isObject(constraints)):
-            constraints = _pushMessageTypes(constraints);
-            break;
-        // 'function' MUST cover all cases internaly
-        default:
-            break;
-    }
-    return constraints;
-}
-
-
-Isntit$2.prototype.checkRules = noop$1;
-// devtools enabled?
-if ( config.env !== 'production') {
-    Isntit$2.prototype.checkRules = function(rules) {
-        var I = this;
-        for (var field in rules) {
-            for (var prop in rules[field]) {
-                var step = I.getStep(prop);
-                var constraints = (checkers[step][prop].types) ? checkers[step][prop].types : checkers[step][prop];
-                constraints = _addDefaultTypes(constraints);
-                var res = checkType(rules[field][prop], constraints);
-                if (!res) {
-                    warn('At least one constraint of "' + prop + '" on "' + field + '" do not comply with following type constraints: ' + JSON.stringify(constraints));
-                }
-            }
-        }
-    };
-}
-
-return Isntit$2;
-
-})));
+module.exports = Isntit$1;

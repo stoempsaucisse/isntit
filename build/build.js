@@ -9,12 +9,12 @@ const uglify = require('uglify-js')
 //   fs.mkdirSync('dist')
 // }
 
-// Update main file
 const version = process.env.VERSION || require('../package.json').version
-// const main = fs
-//   .readFileSync('src/core/index.js', 'utf-8')
-//   .replace(/Vue\.version = '[^']+'/, "Vue.version = '" + version + "'")
-// fs.writeFileSync('src/core/index.js', main)
+// Update main file
+const main = fs
+  .readFileSync('src/index.js', 'utf-8')
+  .replace(/Isntit\.version = '[^']+'/, "Isntit.version = '" + version + "'")
+fs.writeFileSync('src/index.js', main)
 
 let builds = require('./config').getAllBuilds()
 

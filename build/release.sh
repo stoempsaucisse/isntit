@@ -8,17 +8,20 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
     echo "Releasing $VERSION ..."
     export SAUCE_BUILD_ID=$VERSION:`date +"%s"`
-
-    # npm run lint
+    npm run lint
     # npm run flow
     # npm run test:cover
     # npm run test:e2e
     # npm run test:ssr
     # npm run test:sauce
 
+    # Update version in package.json
+    basePath=`realpath $(dirname ${BASH_SOURCE[0]})`
+    json -I -f "$basePath/../package.json" -e "this.version='$VERSION'"
     # build
-    VERSION=$VERSION npm run build
-
+    VERSION=$VERSION npm run build:all
+# echo 'git stuff prevented'
+# exit 0
     # commit
     git add -A
     git commit -m "[build] $VERSION"

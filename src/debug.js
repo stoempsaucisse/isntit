@@ -2,7 +2,8 @@ import { config } from './config'
 import { noop } from './utils'
 
 var warn = noop;
-if (process.env.NODE_ENV !== 'production') {
+/* eslint-disable no-console */
+if ( config.env !== 'production') {
     const hasConsole = typeof console !== 'undefined';
     warn = function(msg, obj) {
         if (hasConsole && (!config.silent)) {
@@ -14,5 +15,6 @@ if (process.env.NODE_ENV !== 'production') {
         }
     }
 }
+/* eslint-enable no-console */
 
 export { warn }

@@ -1,4 +1,3 @@
-import { warn } from './debug'
 /**
  * Perform no operation.
  */
@@ -57,15 +56,16 @@ export function mergeData (to, from) {
         if (! hasOwn(to, key)) {
             set(to, key, fromVal);
         } else if (isObject(toVal) && isObject(fromVal)) {
-            mergeData(toVal, fromVal, override);
+            mergeData(toVal, fromVal);
         }
     }
     return to;
 }
 
-/**
- * Set first character to upercase
- */
-export function ucfirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+export function swap (json) {
+    var ret = {};
+    for(var key in json) {
+        ret[json[key]] = key;
+    }
+    return ret;
 }

@@ -3,6 +3,59 @@ Isntit
 
 Isntit is a simple javascript data validation library. It is inspired by [ansman's validate.js](http://validatejs.org/).
 
+[![npm](https://img.shields.io/npm/v/isntit.svg?style=flat-square)]()
+
+[![GitHub release](https://img.shields.io/github/release/stoempsaucisse/isntit.svg?style=flat-square)]()
+
+[![GitHub tag](https://img.shields.io/github/tag/stoempsaucisse/isntit.svg?style=flat-square)]()
+
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/stoempsaucisse/isntit/master/LICENSE)
+
+Example
+---
+
+```html
+<script src="dist/isntit.min.js" type="text/javascript"></script>
+```
+
+```js
+var options = {
+    capitalize: true,                       // capitalize error messages
+    devtools: config.env !== 'production',  // activate devtools
+    fullMessages: true,                     // prepend messages with the field name
+    silent: false                           // prevent warnings even with devtools
+};
+
+var rules = {
+    email: {
+        required: true,
+        email: {
+            message: "^'%{value}' is not a valid %{label} ex. : you@mail.com"
+        }
+    },
+    user.firstname: {
+        required: true,
+        length: {
+            min: 3
+        }
+    },
+    user.age: {
+        required: false,                    // warns about a rule with false
+        length: {
+            min: 3
+        }
+    }
+};
+
+var I = new Isntit(rules, options);
+
+var results = I.validate({
+    email: "stoempsaucisse@hotmail.com",
+    "user.firstname": "stoempsaucisse"
+});
+
+```
+
 Installation
 ---
 ### Standalone
@@ -22,38 +75,6 @@ Features
 
 Usage
 ---
-### Getting started
-
-```html
-<script src="dist/isntit.min.js" type="text/javascript"></script>
-```
-
-```js
-var options = {
-    fullMessages: true // Prepends all error messages with the field name
-};
-var rules = {
-    email: {
-        required: true,
-        email: {
-            message: "^'%{value}' is not a valid %{label} ex. : you@mail.com"
-        }
-    },
-    user.firstname: {
-        required: true,
-        length: {
-            min: 3
-        }
-    }
-};
-var I = new Isntit(rules, options);
-var results = I.validate({
-    email: "stoempsaucisse@hotmail.com",
-    "user.firstname": "stoempsaucisse"
-});
-```
-
-### Reference
 
 #### Global API
 

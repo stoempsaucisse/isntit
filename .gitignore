@@ -4,3 +4,6 @@ isntit.html
 features
 dist/*.gz
 dist/*.map
+flow
+.flowconfig
+**/*.old

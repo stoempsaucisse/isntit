@@ -2,18 +2,8 @@
  * Default configuration (for production).
  */
 var config = {
-    bitMasks: {
-        string: 1,
-        number: 2,
-        'boolean': 4,
-        'null': 8,
-        date: 16,
-        regexp: 32,
-        array: 64,
-        set: 128,
-        object: 256,
-        rest: (1 << 30)
-    },
+    env: 'process.env.NODE_ENV',
+    silent: false,
     checkersSteps: ['before', 'during'],
     confirmationRE: /(.+)_confirmation$/,
     comparators: {
@@ -82,8 +72,7 @@ var config = {
         required: "is required",
         email: "is not a valid email",
         format: "",
-        length: function() {
-            var context = this;
+        length: function(context) {
             var rule = context.ruleSet['length'];
             if(rule.is) {
                 return 'must be exactly %{is} characters long';

@@ -1,8 +1,5 @@
-/* @flow */
-
-import './utils'
-import './config'
-import './debug'
 import Isntit from './isntit'
+
+Isntit.version = '0.0.3'
 
 export default Isntit
