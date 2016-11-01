@@ -3,13 +3,7 @@ Isntit
 
 Isntit is a simple javascript data validation library. It is inspired by [ansman's validate.js](http://validatejs.org/).
 
-[![npm](https://img.shields.io/npm/v/isntit.svg?style=flat-square)]()
-
-[![GitHub release](https://img.shields.io/github/release/stoempsaucisse/isntit.svg?style=flat-square)]()
-
-[![GitHub tag](https://img.shields.io/github/tag/stoempsaucisse/isntit.svg?style=flat-square)]()
-
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/stoempsaucisse/isntit/master/LICENSE)
+[![npm](https://img.shields.io/npm/v/isntit.svg?style=flat-square)]() [![GitHub release](https://img.shields.io/github/release/stoempsaucisse/isntit.svg?style=flat-square)]() [![GitHub tag](https://img.shields.io/github/tag/stoempsaucisse/isntit.svg?style=flat-square)]() [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/stoempsaucisse/isntit/master/LICENSE)
 
 Example
 ---
@@ -128,7 +122,7 @@ Where:
 Checkers:
 
 * "before" checkers:
-    * required: field must be non empty (using Isntit.isEmpty()).
+    * required: field must be non empty (using `Isntit.isEmpty()`).
     * confirms: field value must be the same as the value of the field with `field: fieldName` checkerProperty. Isntit is smart enough to link field names like `password_confirmation: boolean` and `password: {checkerProperty: any}` (use `config.confirmationRE: RegExp` to customize this behaviour).
 
 * "during" checkers:
