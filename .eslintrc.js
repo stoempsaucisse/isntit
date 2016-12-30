@@ -206,7 +206,17 @@ module.exports = {
         "quote-props": "off",
         "quotes": "off",
         "radix": "error",
-        "require-jsdoc": "off",
+        "require-jsdoc": [
+            "error",
+            {
+                "require":
+                {
+                    "FunctionDeclaration": true,
+                    "MethodDefinition": true,
+                    "ClassDeclaration": true
+                }
+            }
+        ],
         "require-yield": "error",
         "semi": "off",
         "semi-spacing": [
@@ -236,7 +246,30 @@ module.exports = {
             "error",
             "never"
         ],
-        "valid-jsdoc": "off",
+        "valid-jsdoc": [
+            "error",
+            {
+                "prefer": {
+                    "arg": "param",
+                    "argument": "param",
+                    "class": "constructor",
+                    "return": "returns"
+                },
+                "preferType": {
+                    "array": "Array",
+                    "Boolean": "boolean",
+                    "date": "Date",
+                    "Function": "function",
+                    "Number": "number",
+                    "object": "Object",
+                    "regexp": "RegExp",
+                    "String": "string",
+                    "Null": "null",
+                    "Undefined": "undefined"
+                },
+                "requireReturn": false
+            }
+        ],
         "vars-on-top": "off",
         "wrap-iife": "error",
         "wrap-regex": "error",

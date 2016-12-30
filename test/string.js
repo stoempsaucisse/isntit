@@ -32,7 +32,7 @@ describe('String tools', function() {
         it('should return given string with first character uppercased', function(done) {
             var str = 'any string';
             var startCode = str.codePointAt(0);
-            console.log(startCode);
+            // console.log(startCode);
             // code for a == 97, for A == 65 difference is (- 32)
             (s.ucfirst(str).codePointAt(0)).should.be.equal(startCode - 32);
 

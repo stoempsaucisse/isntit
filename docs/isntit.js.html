@@ -1,177 +1,35 @@
-/*!
- * Isntit - a simple javascript validation library
- * version: 0.0.3
- * (c) 2016 stoempsaucisse
- * Released under the MIT License.
- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: isntit.js</title>
 
-'use strict';
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
 
-/**
- * Default configuration object.
- *
- * @type {Object}
- * @property {string}  env=NODE_ENV The environement for current runtime
- * @property {boolean} silent=false   Whether to silence warnings when devtools are enabled
- * @property {string[]} checkersSteps='before','during'  The list of validation steps chronolgicaly ordered.
- * @see  Step
- * @property {regexp}  confirmationRE=/(.+)_confirmation$/  The RegExp to test against to detect if a fieldname is a shorthand for the {@link Checker|confirms} checker.
- * @property {regexp}  emailRE=/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i  The RegExp to validate emails.
- * @copyright Many thanks to Jan Goyvaerts for his {@link http://www.regular-expressions.info/email.html|email regular expression}
- * @property {regexp}  emptyStringRE=/^[\s\t\n\r]+$/  The RegExp that defines which strings are considered as empty. This is used by {@link Isntit.isEmpty}
- * @property {string[]} emptyValues=null,undefined,'undefined'  The values to consider as empty. This is used by {@link Isntit.isEmpty}
- * @property {Object.<string, MessageTypes>} messages The fallback error messages tu use when validation against default checkers fails. Use the {@link Checker|checker name} as key.
- * @property {string} noLabelChar=^ Any error message starting with this chaaracter will never be prepended with the corresponding field name (even when {@link Options| options.fullMessages}) is true.
- */
-var config = {
-    env: process.env.NODE_ENV,
-    silent: false,
-    checkersSteps: ['before', 'during'],
-    confirmationRE: /(.+)_confirmation$/,
-    /**
-     * Many thanks to Jan Goyvaerts for his email regular expression
-     * @url : http://www.regular-expressions.info/email.html
-     */
-    emailRE: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-    emptyStringRE: /^[\s\t\n\r]+$/,
-    emptyValues: [null, undefined, 'undefined'],
-    messages: {
-        confirms: "should be sames as %{field}",
-        required: "is required",
-        email: "is not a valid email",
-        format: "",
-        length: function(context) {
-            var rule = context.ruleSet['length'];
-            if(rule.is) {
-                return 'must be exactly %{is} characters long';
-            }
-            if(rule.min && rule.max) {
-                return 'must be between %{min} and %{max} characters long';
-            }
-            if(rule.min) {
-                return 'must be minimum %{min} characters long';
-            }
-            if(rule.max) {
-                return 'must be maximum %{min} characters long';
-            }
-        },
-        numeric: {
-            onlyInteger: 'must be an integer',
-            noStrings: 'strings are not allowed',
-            equalTo: 'must be equal to %{equalTo}',
-            notEqualTo: 'must not be equal to %{notEqualTo}',
-            greaterThan: 'must be greater than %{greaterThan}',
-            greaterThanOrEqualTo: 'must be greater than or equal to %{greaterThanOrEqualTo}',
-            lessThan: 'must be less than %{lessThan}',
-            lessThanOrEqualTo: 'must be less than or equal to %{lessThanOrEqualTo}'
-        },
-        notValid: "is not valid."
-    },
-    noLabelChar: "^"
-};
+<body>
 
-/**
- * Perform no operation.
- *
- * @ignore
- */
-function noop() {}
+<div id="main">
 
-/**
- * Check whether the object has the property.
- *
- * @param {Object} obj The object for which the presence of a property with name = key.
- * @param {string} key The name of the property for which the presence is being checked.
- *
- * @returns {boolean} Whether given object has a property named as given key.
- * 
- * @ignore
- */
-function hasOwn (obj, key) {
-    return Object.prototype.hasOwnProperty.call(obj, key);
-}
-// const hasOwnProperty = Object.prototype.hasOwnProperty
+    <h1 class="page-title">Source: isntit.js</h1>
 
-/**
- * Quick object check - this is primarily used to tell
- * Objects from primitive values when we know the value
- * is a JSON-compliant type.
- * 
- * @param {Object} obj An object that needs to be checked if it actualy is one.
- *
- * @returns {boolean} Whether given object actualy is an object.
- * 
- * @ignore
- */
-function isObject (obj) {
-  return obj !== null && typeof obj === 'object'
-}
+    
 
-/**
- * Swap key-values pairs from object
- *
- * @param {Object} json  A flat object from which key-values should be swaped.
- *
- * @returns {Object}  An new object where the keys are the values from given object and the values are the keys from given object.
- *
- * @ignore
- */
 
-var warn = noop;
-/* eslint-disable no-console */
-if ( config.env !== 'production') {
-    var hasConsole = typeof console !== 'undefined';
-    warn = function(msg, obj) {
-        if (hasConsole && (!config.silent)) {
-            if (obj) {
-                console.error(("[Isntit warn]: " + msg), obj);
-            } else {
-                console.error(("[Isntit warn]: " + msg));
-            }
-        }
-    };
-}
 
-/**
- * Parse a string to replace placeholders.
- *
- * @param    {string}                   str           The string to parse for
- *                                                    `%{placeholder}`.
- * @param    {Object.<string, string>}  replacements  A collection of
- *                                                    placeholder: value.
- *
- * @returns  {string}                                 The string with
- *                                                    placeholders replaced with
- *                                                    corresponding values.
- *                                                    If there is no match for
- *                                                    placeholder: value in 
- *                                                    replacements, then `%{placeholder}`
- *                                                    will remain in the string.
- *
- * @alias Isntit.printf
- */
-function printf(str, replacements) {
-    return str.replace(/\%\{([\w\d_\.]+)\}/g, function(match, placeholder){
-        if (typeof replacements[placeholder] != 'undefined') {
-            return replacements[placeholder];
-        }
-        warn(("There is no replacement for " + match + " in " + str), replacements);
-        return match;
-    });
-}
-
-/**
- * Uppercase the first character of given string
- *
- * @ignore
- *
- * @param    {string}  str  The string to capitalize.
- *
- * @returns  {string}  The capitalized string.
- */
-function ucfirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { warn } from './debug'
+import { config } from './config'
+import { hasOwn, isObject, noop } from './utils'
+import { printf, ucfirst } from './string'
 
 /**
  * A simple javascript validation library
@@ -181,13 +39,13 @@ function ucfirst(str) {
  *
  * @constructor
  */
-function Isntit$1(rules, options) {
+function Isntit(rules, options) {
     // called as function
-    if (!(this instanceof Isntit$1)) {
+    if (!(this instanceof Isntit)) {
         warn('Isntit([rules [, options]]) is a constructor and should be called with the "new" keyword.');
-        return new Isntit$1(rules, options);
+        return new Isntit(rules, options);
     }
-    if (options && options.config) {
+    if (options &amp;&amp; options.config) {
         Object.assign(config, options.config);
         delete options.config;
     }
@@ -205,15 +63,15 @@ function Isntit$1(rules, options) {
 /**
  * The validation rules object to pass to the {@link Isntit} constructor or to Isntit's validate method.
  *
- * @typedef   {Object.<string, Object>}  Rules
- * @property  {(Object.<string, Constraints>|boolean)}  `fieldName`  The rules to validate the value of field.
+ * @typedef   {Object.&lt;string, Object>}  Rules
+ * @property  {(Object.&lt;string, Constraints>|boolean)}  `fieldName`  The rules to validate the value of field.
  * @property  {Constraints|boolean}  `fieldName`.`checkerName`  The constraints to pass to the checker.
  */
 
 /**
  * The constraints to pass to corresponding {@link Checker|checker}.
  *
- * @typedef   {Object.<string, *>}  Constraints
+ * @typedef   {Object.&lt;string, *>}  Constraints
  * @property {ErrorMessageProvider} [message] A customized error message.
  * @property {string|number|boolean} [`constraintName`]  The value of a constraint to pass to the checker.
  * @see  confirms|required|email|format|length|numeric
@@ -239,13 +97,13 @@ var confirms = {
     validate: function(value, context) {
         var data = context.data;
         var _confirms = context.ruleSet.confirms;
-        _confirms['otherValue'] = data[confirms.field];
+        _confirms['otherValue'] = data[_confirms.field];
         return (_confirms.strict) ?
             (value === _confirms.otherValue) :
             (value == _confirms.otherValue);
     },
     types: ['boolean', { field: 'string' }]
-};
+}
 
 /**
  * Check that a field is not empty (uses {@link Isntit.isEmpty}).
@@ -255,10 +113,10 @@ var confirms = {
  */
 var required = {
     validate: function(value) {
-        return !Isntit$1.isEmpty(value);
+        return !Isntit.isEmpty(value);
     },
     types: 'boolean'
-};
+}
 
 /**
  * Check that the value is formated as an email (uses {@link Config|config.emailRE}).
@@ -281,7 +139,7 @@ var email = {
         
     },
     types: 'boolean'
-};
+}
 
 /**
  * Check that the value matches against given RegExp.
@@ -299,7 +157,7 @@ var format = {
     },
     preprocess: function(value) {
         var I = this;
-        if (typeof value !== 'string' && typeof value !== 'number') {
+        if (typeof value !== 'string' &amp;&amp; typeof value !== 'number') {
             I.cache.messages['format::preprocess'] = 'Values checked for format MUST either be of type string or number. Given: ' + value;
             return false;
         }
@@ -307,7 +165,7 @@ var format = {
         
     },
     types: ['regexp', { pattern: 'regexp' }]
-};
+}
 
 /**
  * Check that value comply with legth constraints.
@@ -328,7 +186,7 @@ var length = {
             return (value.length >= context.ruleSet['length'].min);
         },
         max: function(value, context) {
-            return (value.length <= context.ruleSet['length'].max);
+            return (value.length &lt;= context.ruleSet['length'].max);
         }
     },
     preprocess: function(value) {
@@ -342,7 +200,7 @@ var length = {
     types: {
         __all: 'number'
     }
-};
+}
 
 /**
  * Check value by comparing it with given constraints.
@@ -357,7 +215,7 @@ var length = {
  * @property {number} [lessThanOrEqualTo]
  * @property {number} [greaterThan]
  * @property {boolean} [noStrings]  Whether to accept numbers as strings
- * @property {boolean} [oblyIntegers]  Whether to accept only integers.
+ * @property {boolean} [onlyIntegers]  Whether to accept only integers.
  * @property {ErrorMessageProvider} [message] A customized error message.
  */
 var numeric = {
@@ -375,10 +233,10 @@ var numeric = {
             return (+value >= context.ruleSet['numeric'].greaterThanOrEqualTo);
         },
         lessThan: function(value, context) {
-            return (+value < context.ruleSet['numeric'].lessThan);
+            return (+value &lt; context.ruleSet['numeric'].lessThan);
         },
         lessThanOrEqualTo: function(value, context) {
-            return (+value <= context.ruleSet['numeric'].lessThanOrEqualTo);
+            return (+value &lt;= context.ruleSet['numeric'].lessThanOrEqualTo);
         },
         noStrings: function(value) {
             return (typeof value !== 'string');
@@ -390,7 +248,7 @@ var numeric = {
     },
     preprocess: function(value) {
         var I = this;
-        if (typeof value !== 'string' && typeof value !== 'number') {
+        if (typeof value !== 'string' &amp;&amp; typeof value !== 'number') {
             I.cache.messages['numeric::preprocess'] = 'Values checked for numeric MUST either be of type string or number. Given: ' + value;
             return false;
         }
@@ -402,7 +260,7 @@ var numeric = {
         onlyInteger: 'boolean',
         __others: 'number'
     }
-};
+}
 
 /**
  * To customize the error messages you can either provide a string,
@@ -431,7 +289,7 @@ var numeric = {
 /**
  * An object with `constraintName`s as keys and {@link MessageString}s or {@link MessageFunction}s as value.
  *
- * @typedef {Object.<string, (MessageString|MessageFunction)>}  MessageObject
+ * @typedef {Object.&lt;string, (MessageString|MessageFunction)>}  MessageObject
  * @property {MessageString} [{@link Checker|`constraintName`}] A constraintName-MessageString pair.
  */
 
@@ -444,7 +302,7 @@ var numeric = {
  * @property  {boolean}  [fullMessages=false]  Whether to prefix error messages with corresponding field name.
  * @property  {Object}   [config]        The {@link config} properties to override.
  */
-Isntit$1.prototype.options = {
+Isntit.prototype.options = {
     capitalize: true,
     devtools: config.env !== 'production',
     fullMessages: false
@@ -464,14 +322,14 @@ Isntit$1.prototype.options = {
 /**
  * A collection of {@link Checker|checker}s. Validation happens by steps. If one rule fails during current step, validation ends at the end of this step.
  *
- * @typedef  {Object.<string, Checker>}  Step
+ * @typedef  {Object.&lt;string, Checker>}  Step
  */
 
 /**
  * A checker is responsible for the validation of data. It holds the validation logic and the optional pre-validation check and type rules.
  *
- * @typedef  {Object.<string, (Object|function)>}  Checker
- * @property {(function|Object.<string, function>)} validate  The logic that validates the value. Receives value and the current {@link Context|context} as arguments.
+ * @typedef  {Object.&lt;string, (Object|function)>}  Checker
+ * @property {(function|Object.&lt;string, function>)} validate  The logic that validates the value. Receives value and the current {@link Context|context} as arguments.
  * @property {function} [preporcess]  A function that is called before actually validating the value. This is generaly used to check the type of given value and fail if the type is wrong without even trying to validate it.
  * @property {TypeRule} [types] When devtools are enabled, {@link Constraints|field rules} are checked with {@link checkType} to enforce the right types of constraints values.
  * @example
@@ -484,7 +342,7 @@ Isntit$1.prototype.options = {
  *              return (value.length >= context.ruleSet['length'].min);
  *          },
  *          max: function(value, context) {
- *              return (value.length <= context.ruleSet['length'].max);
+ *              return (value.length &lt;= context.ruleSet['length'].max);
  *          }
  *      },
  *      preprocess: function(value, context) {
@@ -515,7 +373,7 @@ Isntit$1.prototype.options = {
  * @property {Checker} during.numeric Compare given value against the rule constraints.  {@link numeric}
  * @see  Constraints
  */
-var checkers = {
+export var checkers = {
     before: {
         confirms: confirms,
         required: required
@@ -526,7 +384,7 @@ var checkers = {
         length: length,
         numeric: numeric
     }
-};
+}
 
 /**
  * Get the collection of steps and checkers currently in use.
@@ -535,9 +393,9 @@ var checkers = {
  *
  * @see  Step
  */
-Isntit$1.getCheckers = function() {
+Isntit.getCheckers = function() {
     return checkers;
-};
+}
 
 /**
  * Register a checker. You may add a checker to a new or existing step or override an existing checker.
@@ -548,9 +406,9 @@ Isntit$1.getCheckers = function() {
  * @param    {string[]} checkersSteps  A list of steps to use dureing validation. Note that the order matters.
  * @see  Step
  */
-Isntit$1.registerChecker = function(checker, name, step, checkersSteps) {
+Isntit.registerChecker = function(checker, name, step, checkersSteps) {
     var I = this;
-    if (typeof checker !== 'function' && !hasOwn(checker, 'validate')) {
+    if (typeof checker !== 'function' &amp;&amp; !hasOwn(checker, 'validate')) {
         if (arguments.length > 3) {
             warn('Instance methode registerChecker() signature is:\n(object[, step[, checkersSteps]]), supplemental arguments will be ignored.', Array.from(arguments));
         }
@@ -585,7 +443,7 @@ Isntit$1.registerChecker = function(checker, name, step, checkersSteps) {
             };
         }
     }
-};
+}
 
 /**
  * Check if an object is considered as empty.
@@ -596,32 +454,32 @@ Isntit$1.registerChecker = function(checker, name, step, checkersSteps) {
  *
  * @see {@link Config|config.emptyStringRE}
  */
-Isntit$1.isEmpty = function(obj) {
+Isntit.isEmpty = function(obj) {
     var typeOf = typeof obj;
-    if ((typeOf === 'string' || typeOf === 'array') && obj.length === 0) {
+    if ((typeOf === 'string' || typeOf === 'array') &amp;&amp; obj.length === 0) {
         return true;
     }
-    if ((typeOf === 'string') && config.emptyStringRE.test(obj)) {
+    if ((typeOf === 'string') &amp;&amp; config.emptyStringRE.test(obj)) {
         return true;
     }
-    if (isObject(obj) && Object.keys(obj).length === 0) {
+    if (isObject(obj) &amp;&amp; Object.keys(obj).length === 0) {
         return true;
     }
-    for (var i = 0; i < config.emptyValues.length; i++) {
+    for (var i = 0; i &lt; config.emptyValues.length; i++) {
         if (obj === config.emptyValues[i]) {
             return true;
         }
     }
     return false;
-};
+}
 
 // Wraper to string.printf
 // Documentation: see './string.printf'
-Isntit$1.printf = printf;
+Isntit.printf = printf;
 
 // Wraper to string.ucfirst
 // Documentation: see './string.ucfirst'
-Isntit$1.ucfirst = ucfirst;
+Isntit.ucfirst = ucfirst;
 
 /**
  * Set that an error occured in given context durring current validation.
@@ -739,7 +597,7 @@ function _handleErrors(fieldName, value, context) {
     // Should the message be prepended with %{label}
     var noPrepend = message.charAt(0) === config.noLabelChar;
     var fullMessage = context.rules[context.fieldName][context.ruleName]['fullMessage'] || I.options.fullMessages;
-    if (fullMessage && !noPrepend) {
+    if (fullMessage &amp;&amp; !noPrepend) {
         message = '%{label} ' + message;
     }
     if (noPrepend) {
@@ -763,9 +621,9 @@ function _handleErrors(fieldName, value, context) {
  * @typedef  {Object}                       Context
  * @property {*}                            value        The value of the field under validation.
  * @property {string}                       `fieldName`  The name of the field under valoidation.
- * @property {Object.<string, *>}           data         The whole data object that is currently validated.
+ * @property {Object.&lt;string, *>}           data         The whole data object that is currently validated.
  * @property {string}                       `ruleName`   The name of the checker currently called.
- * @property {Object.<string, Constraints>}  ruleSet      The collection of rules to check current field against.
+ * @property {Object.&lt;string, Constraints>}  ruleSet      The collection of rules to check current field against.
  * @property {Rules}                        rules        All the rules curently used during validation.
  * @property {string}                       step         The name of the current {@link Step|step}.
  * 
@@ -776,14 +634,14 @@ function _handleErrors(fieldName, value, context) {
  *
  * @param    {*}  value      The value under validation.
  * @param    {string}  fieldName  The name of the field under validation.
- * @param    {Object.<string, *>}  data       The data under validation.
+ * @param    {Object.&lt;string, *>}  data       The data under validation.
  * @param    {Rules}  rules      The rules the data must comply with.
  *
  * @private
  */
 function _loopThroughCheckers(value, fieldName, data, rules) {
     var I = this;
-    for (var i = 0; i < config.checkersSteps.length; i++) {
+    for (var i = 0; i &lt; config.checkersSteps.length; i++) {
         var step = config.checkersSteps[i];
         // Looping on rules for current data field
         for (var ruleName in rules[fieldName]) {
@@ -792,7 +650,7 @@ function _loopThroughCheckers(value, fieldName, data, rules) {
             if (typeof checker !== 'undefined') {
                 // Exit loop and warn if rule === false
                 if (rules[fieldName][ruleName] === false) {
-                    warn(("Rule definition for '" + ruleName + "' set to 'false', are you shure?"), rules[fieldName]);
+                    warn(`Rule definition for '${ruleName}' set to 'false', are you shure?`, rules[fieldName]);
                     break;
 
                 }
@@ -807,7 +665,7 @@ function _loopThroughCheckers(value, fieldName, data, rules) {
                     step: step
                 };
                 // Call preprocess
-                if (typeof checker.preprocess === "function" && !checker.preprocess.call(I, value, context)) {
+                if (typeof checker.preprocess === "function" &amp;&amp; !checker.preprocess.call(I, value, context)) {
                     _setError.call(I, context, context.fieldName, context.ruleName, 'preprocess');
                 } else {
                     _callChecker.call(I, checker, value, context);
@@ -826,12 +684,12 @@ function _loopThroughCheckers(value, fieldName, data, rules) {
 /**
  * Validate given data.
  *
- * @param    {Object.<string, *>}  data   The data to validate.
+ * @param    {Object.&lt;string, *>}  data   The data to validate.
  * @param    {Rules}  [rules=this.rules]  The rules to validate aginst. If omited, the rules passed to the constructor are used.
  *                                                      
- * @returns  {boolean|Object.<string, string>}         Returns true if all data validates or a collection of fieldName-errorMessage pairs.
+ * @returns  {boolean|Object.&lt;string, string>}         Returns true if all data validates or a collection of fieldName-errorMessage pairs.
  */
-Isntit$1.prototype.validate = function(data, rules) {
+Isntit.prototype.validate = function(data, rules) {
     var I = this;
     if (rules) {
         I.checkRules(rules);
@@ -850,7 +708,7 @@ Isntit$1.prototype.validate = function(data, rules) {
                         confirms: {
                             field: matches[1]
                         }
-                    };
+                    }
                 }
             }
             // Get the value to check
@@ -858,21 +716,21 @@ Isntit$1.prototype.validate = function(data, rules) {
             _loopThroughCheckers.call(I, value, fieldName, data, rules);
         }
     }
-    return (Isntit$1.isEmpty(I.errors)) ? true : I.errors;
-};
+    return (Isntit.isEmpty(I.errors)) ? true : I.errors;
+}
 
-Isntit$1.prototype.getCheckers = function() {
+Isntit.prototype.getCheckers = function() {
     return checkers;
-};
+}
 
-Isntit$1.prototype.getMessages = function() {
+Isntit.prototype.getMessages = function() {
     return this.errors;
-};
+}
 
-Isntit$1.prototype.getStep = function(ruleName) {
+Isntit.prototype.getStep = function(ruleName) {
     var I = this;
     if (!I.cache.checkersToStep[ruleName]) {
-        for (var i = 0; i < config.checkersSteps.length; i++) {
+        for (var i = 0; i &lt; config.checkersSteps.length; i++) {
             if (checkers[config.checkersSteps[i]][ruleName]) {
                 I.cache.checkersToStep[ruleName] = config.checkersSteps[i];
                 break;
@@ -884,8 +742,29 @@ Isntit$1.prototype.getStep = function(ruleName) {
         }
     }
     return I.cache.checkersToStep[ruleName];
-};
+}
 
-Isntit$1.version = '0.0.3';
 
-module.exports = Isntit$1;
+export default Isntit;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Isntit.html">Isntit</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkers">checkers</a></li><li><a href="global.html#checkType">checkType</a></li><li><a href="global.html#config">config</a></li><li><a href="global.html#confirms">confirms</a></li><li><a href="global.html#email">email</a></li><li><a href="global.html#format">format</a></li><li><a href="global.html#length">length</a></li><li><a href="global.html#numeric">numeric</a></li><li><a href="global.html#required">required</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Fri Dec 30 2016 10:49:26 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

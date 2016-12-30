@@ -1,7 +1,7 @@
 const path = require('path')
+const flow = require('rollup-plugin-flow-no-whitespace')
 const buble = require('rollup-plugin-buble')
 const replace = require('rollup-plugin-replace')
-const alias = require('rollup-plugin-alias')
 const version = process.env.VERSION || require('../package.json').version
 const firstYear = 2016;
 const year = new Date().getFullYear();
@@ -23,20 +23,14 @@ const builds = {
     dest: path.resolve(__dirname, '../dist/isntit.js'),
     format: 'umd',
     env: 'development',
-    banner,
-    alias: {
-      he: './entity-decoder'
-    }
+    banner
   },
   'web-standalone-prod': {
     entry: path.resolve(__dirname, '../src/entries/production.js'),
     dest: path.resolve(__dirname, '../dist/isntit.min.js'),
     format: 'umd',
     env: 'production',
-    banner,
-    alias: {
-      he: './entity-decoder'
-    }
+    banner
   },
   'web-runtime-dev': {
     entry: path.resolve(__dirname, '../src/index.js'),
@@ -55,9 +49,9 @@ function genConfig (opts) {
     banner: opts.banner,
     moduleName: 'Isntit',
     plugins: [
-      buble(),
-      alias(Object.assign({}, /*baseAlias, */opts.alias))
-    ]
+      flow(),
+      buble()
+    ]/**/
   }
 
   if (opts.env) {

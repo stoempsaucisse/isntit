@@ -66,15 +66,15 @@ describe('Type tools', function() {
             done();
         });
     });
-    describe('typeBits', function() {
+    describe('typeNumber', function() {
         var values = new Set();
         var length = 0;
-        for (var key in t.typeBits) {
+        for (var key in t.typeNumber) {
             ++length;
-            values.add(t.typeBits[key]);
+            values.add(t.typeNumber[key]);
         }
         it('should be an object', function(done) {
-            (t.typeBits).should.be.Object();
+            (t.typeNumber).should.be.Object();
             done();
         });
         it('should have unique values', function(done) {
@@ -99,21 +99,21 @@ describe('Type tools', function() {
             done();
         });
     });
-    describe('setTypeBit', function() {
+    describe('setTypeNumber', function() {
         it('should set the bit for given type', function(done) {
             // On existing type
             var typeName = 'string';
-            var originalInt = t.typeBits[typeName];
+            var originalInt = t.typeNumber[typeName];
             var typeInt = 18;
-            t.setTypeBit(typeName, typeInt);
-            (t.typeBits[typeName]).should.be.equal(typeInt);
-            t.setTypeBit(typeName, originalInt);
+            t.setTypeNumber(typeName, typeInt);
+            (t.typeNumber[typeName]).should.be.equal(typeInt);
+            t.setTypeNumber(typeName, originalInt);
             // On new type
             typeName = 'unknown';
             typeInt = 0;
-            t.setTypeBit(typeName, typeInt);
-            (t.typeBits[typeName]).should.be.equal(typeInt);
-            delete t.typeBits[typeName];
+            t.setTypeNumber(typeName, typeInt);
+            (t.typeNumber[typeName]).should.be.equal(typeInt);
+            delete t.typeNumber[typeName];
             done();
         });
     });

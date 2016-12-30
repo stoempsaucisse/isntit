@@ -1,0 +1,4 @@
+-R min
+--require should
+--require babel-register
+--check-leaks
