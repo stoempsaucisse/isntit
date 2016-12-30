@@ -3,7 +3,7 @@
  *
  * @ignore
  */
-export function noop() {};
+export function noop() {}
 
 /**
  * Check whether the object has the property.

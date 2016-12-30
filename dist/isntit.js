@@ -1,6 +1,6 @@
 /*!
  * Isntit - a simple javascript validation library
- * version: 0.0.3
+ * version: 1.0.0
  * (c) 2016 stoempsaucisse
  * Released under the MIT License.
  */
@@ -250,7 +250,7 @@ var confirms = {
     validate: function(value, context) {
         var data = context.data;
         var _confirms = context.ruleSet.confirms;
-        _confirms['otherValue'] = data[confirms.field];
+        _confirms['otherValue'] = data[_confirms.field];
         return (_confirms.strict) ?
             (value === _confirms.otherValue) :
             (value == _confirms.otherValue);
@@ -368,7 +368,7 @@ var length = {
  * @property {number} [lessThanOrEqualTo]
  * @property {number} [greaterThan]
  * @property {boolean} [noStrings]  Whether to accept numbers as strings
- * @property {boolean} [oblyIntegers]  Whether to accept only integers.
+ * @property {boolean} [onlyIntegers]  Whether to accept only integers.
  * @property {ErrorMessageProvider} [message] A customized error message.
  */
 var numeric = {
@@ -897,7 +897,7 @@ Isntit$2.prototype.getStep = function(ruleName) {
     return I.cache.checkersToStep[ruleName];
 };
 
-Isntit$2.version = '0.0.3';
+Isntit$2.version = '1.0.0';
 
 /**
  * A collection of javascript types corresponding to unique numbers.
@@ -1196,12 +1196,13 @@ function _addDefaultTypes(constraints) {
     return constraints;
 }
 
-
 Isntit$2.prototype.checkRules = noop$1;
 // devtools enabled?
 if ( config.env !== 'production') {
     /**
-     * Check that the format of given {@link Rules|rules} comply with the registered {@link Checker|checker}s's {@link TypeRule} definitions.
+     * Check that the format of given {@link Rules|rules} comply with the 
+     * registered {@link Checker|checker}s's {@link TypeRule} definitions.
+     * <br/>Note : this method is only enabled when the source code is build with `config.env !== 'production'`
      *
      * @param    {Rules}  rules  The Rules set to check
      *

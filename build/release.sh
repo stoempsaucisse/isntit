@@ -14,22 +14,18 @@ then
     # npm run test:e2e
     # npm run test:ssr
     # npm run test:sauce
+    npm run test:all
 
-    # Update version in package.json
-    basePath=`realpath $(dirname ${BASH_SOURCE[0]})`
-    json -I -f "$basePath/../package.json" -e "this.version='$VERSION'"
     # build
     VERSION=$VERSION npm run build:all
-# echo 'git stuff prevented'
-# exit 0
     # commit
     git add -A
     git commit -m "[build] $VERSION"
-    # npm version $VERSION --message "[release] $VERSION"
+    npm version $VERSION --message "[release] $VERSION"
 
     # publish
     git tag v$VERSION
     git push origin refs/tags/v$VERSION
     git push
-    # npm publish
+    npm publish
 fi

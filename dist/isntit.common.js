@@ -1,6 +1,6 @@
 /*!
  * Isntit - a simple javascript validation library
- * version: 0.0.3
+ * version: 1.0.0
  * (c) 2016 stoempsaucisse
  * Released under the MIT License.
  */
@@ -239,7 +239,7 @@ var confirms = {
     validate: function(value, context) {
         var data = context.data;
         var _confirms = context.ruleSet.confirms;
-        _confirms['otherValue'] = data[confirms.field];
+        _confirms['otherValue'] = data[_confirms.field];
         return (_confirms.strict) ?
             (value === _confirms.otherValue) :
             (value == _confirms.otherValue);
@@ -357,7 +357,7 @@ var length = {
  * @property {number} [lessThanOrEqualTo]
  * @property {number} [greaterThan]
  * @property {boolean} [noStrings]  Whether to accept numbers as strings
- * @property {boolean} [oblyIntegers]  Whether to accept only integers.
+ * @property {boolean} [onlyIntegers]  Whether to accept only integers.
  * @property {ErrorMessageProvider} [message] A customized error message.
  */
 var numeric = {
@@ -886,6 +886,6 @@ Isntit$1.prototype.getStep = function(ruleName) {
     return I.cache.checkersToStep[ruleName];
 };
 
-Isntit$1.version = '0.0.3';
+Isntit$1.version = '1.0.0';
 
 module.exports = Isntit$1;

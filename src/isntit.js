@@ -1,6 +1,6 @@
 import { warn } from './debug'
 import { config } from './config'
-import { hasOwn, isObject, noop } from './utils'
+import { hasOwn, isObject } from './utils'
 import { printf, ucfirst } from './string'
 
 /**

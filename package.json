@@ -1,5 +1,5 @@
 {
-  "name": "Isntit",
+  "name": "isntit",
   "version": "0.0.3",
   "description": "Simple javascript data validation library",
   "main": "dist/isntit.common.js",

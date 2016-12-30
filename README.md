@@ -69,6 +69,10 @@ Features
 * use steps to prioritize some checkers upon others (if a step fails, checkers in following steps are not called)
 * helpers: `Isntit.printf(string: string, replacements: Array<any>)` or `Isntit.isEmpty(value: any)`
 
+Documentation
+---
+Isntit uses [JSDoc](http://usejsdoc.org/) to automaticaly generate its [documentation](https://stoempsaucisse.github.io/isntit/).
+
 Unit testing
 ---
 Actually only validation, string helpers and type checking are covered.
