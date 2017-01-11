@@ -27,13 +27,15 @@ var rules = {
         required: true,
         email: {
             message: "^'%{value}' is not a valid %{label} ex. : you@mail.com"
-        }
+        },
+        label: 'email address'
     },
     user.firstname: {
         required: true,
         length: {
             min: 3
-        }
+        },
+        label: 'firstname'
     },
     user.age: {
         required: false,                    // Isntit warns about and skip a rule with false

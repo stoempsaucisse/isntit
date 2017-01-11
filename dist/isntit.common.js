@@ -1,6 +1,6 @@
 /*!
  * Isntit - a simple javascript validation library
- * version: 1.0.0
+ * version: 1.1.0
  * (c) 2016-2017 stoempsaucisse
  * Released under the MIT License.
  */
@@ -886,6 +886,6 @@ Isntit$1.prototype.getStep = function(ruleName) {
     return I.cache.checkersToStep[ruleName];
 };
 
-Isntit$1.version = '1.0.0';
+Isntit$1.version = '1.1.0';
 
 module.exports = Isntit$1;

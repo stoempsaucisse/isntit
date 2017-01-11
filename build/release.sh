@@ -18,13 +18,14 @@ then
 
     # build
     VERSION=$VERSION npm run build:all
+    
     # commit
     git add -A
     git commit -m "[build] $VERSION"
-    # npm version $VERSION --message "[release] $VERSION"
+    npm version $VERSION --message "[release] $VERSION"
 
     # publish
-    # git tag v$VERSION
+    git tag v$VERSION
     git push origin refs/tags/v$VERSION
     git push
     npm publish

@@ -1,6 +1,6 @@
 /*!
  * Isntit - a simple javascript validation library
- * version: 1.0.0
+ * version: 1.1.0
  * (c) 2016-2017 stoempsaucisse
  * Released under the MIT License.
  */
@@ -897,7 +897,7 @@ Isntit$2.prototype.getStep = function(ruleName) {
     return I.cache.checkersToStep[ruleName];
 };
 
-Isntit$2.version = '1.0.0';
+Isntit$2.version = '1.1.0';
 
 /**
  * A collection of javascript types corresponding to unique numbers.
