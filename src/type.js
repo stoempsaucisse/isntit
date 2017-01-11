@@ -191,7 +191,7 @@ export function checkType(object, typeRules) {
  * 'number'                             // The object should be a number.
  * or
  * ['boolean', ['string', 'number']]    // The object should either be a boolean
- *                                      // or a array of string and/or numbers.
+ *                                      // or an array of string and/or numbers.
  * or
  * {                                    // noStrings and onlyIntegers should be
  *     noStrings: 'boolean',            // booleans, all other properties should

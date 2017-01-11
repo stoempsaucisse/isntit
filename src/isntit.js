@@ -561,7 +561,7 @@ function _handleErrors(fieldName, value, context) {
     // Prepare replacements for parsing
     var replacements = {
         value: context.value,
-        label: context.fieldName
+        label: context.ruleSet.label || context.fieldName
     };
     // Add properties from rule definition :
     // length.min = 1, numeric.noStrings = false,...
@@ -592,7 +592,7 @@ function _handleErrors(fieldName, value, context) {
  *
  * @typedef  {Object}                       Context
  * @property {*}                            value        The value of the field under validation.
- * @property {string}                       `fieldName`  The name of the field under valoidation.
+ * @property {string}                       `fieldName`  The name of the field under validation.
  * @property {Object.<string, *>}           data         The whole data object that is currently validated.
  * @property {string}                       `ruleName`   The name of the checker currently called.
  * @property {Object.<string, Constraints>}  ruleSet      The collection of rules to check current field against.

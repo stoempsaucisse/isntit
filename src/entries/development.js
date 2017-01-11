@@ -13,6 +13,8 @@ var messageTypes = [
     }
 ];
 
+var labelTypes = 'string';
+
 /**
  * Add 'message types' on top of given type checking object.
  *
@@ -91,9 +93,14 @@ if ( config.env !== 'production') {
         var I = this;
         for (var field in rules) {
             for (var prop in rules[field]) {
-                var step = I.getStep(prop);
-                var constraints = (checkers[step][prop].types) ? checkers[step][prop].types : checkers[step][prop];
-                constraints = _addDefaultTypes(constraints);
+                var constraints;
+                if (prop === 'label') {
+                    constraints = labelTypes;
+                } else {
+                    var step = I.getStep(prop);
+                    constraints = (checkers[step][prop].types) ? checkers[step][prop].types : checkers[step][prop];
+                    constraints = _addDefaultTypes(constraints);
+                }
                 var res = checkType(rules[field][prop], constraints);
                 if (!res) {
                     warn('At least one constraint of "' + prop + '" on "' + field + '" do not comply with following type constraints: ' + JSON.stringify(constraints));

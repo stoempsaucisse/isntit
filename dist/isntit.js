@@ -1,7 +1,7 @@
 /*!
  * Isntit - a simple javascript validation library
  * version: 1.0.0
- * (c) 2016 stoempsaucisse
+ * (c) 2016-2017 stoempsaucisse
  * Released under the MIT License.
  */
 
@@ -742,7 +742,7 @@ function _handleErrors(fieldName, value, context) {
     // Prepare replacements for parsing
     var replacements = {
         value: context.value,
-        label: context.fieldName
+        label: context.ruleSet.label || context.fieldName
     };
     // Add properties from rule definition :
     // length.min = 1, numeric.noStrings = false,...
@@ -773,7 +773,7 @@ function _handleErrors(fieldName, value, context) {
  *
  * @typedef  {Object}                       Context
  * @property {*}                            value        The value of the field under validation.
- * @property {string}                       `fieldName`  The name of the field under valoidation.
+ * @property {string}                       `fieldName`  The name of the field under validation.
  * @property {Object.<string, *>}           data         The whole data object that is currently validated.
  * @property {string}                       `ruleName`   The name of the checker currently called.
  * @property {Object.<string, Constraints>}  ruleSet      The collection of rules to check current field against.
@@ -1078,7 +1078,7 @@ function checkType(object, typeRules) {
  * 'number'                             // The object should be a number.
  * or
  * ['boolean', ['string', 'number']]    // The object should either be a boolean
- *                                      // or a array of string and/or numbers.
+ *                                      // or an array of string and/or numbers.
  * or
  * {                                    // noStrings and onlyIntegers should be
  *     noStrings: 'boolean',            // booleans, all other properties should
@@ -1133,6 +1133,8 @@ var messageTypes = [
         __all: ['string', 'function']
     }
 ];
+
+var labelTypes = 'string';
 
 /**
  * Add 'message types' on top of given type checking object.
@@ -1212,9 +1214,14 @@ if ( config.env !== 'production') {
         var I = this;
         for (var field in rules) {
             for (var prop in rules[field]) {
-                var step = I.getStep(prop);
-                var constraints = (checkers[step][prop].types) ? checkers[step][prop].types : checkers[step][prop];
-                constraints = _addDefaultTypes(constraints);
+                var constraints;
+                if (prop === 'label') {
+                    constraints = labelTypes;
+                } else {
+                    var step = I.getStep(prop);
+                    constraints = (checkers[step][prop].types) ? checkers[step][prop].types : checkers[step][prop];
+                    constraints = _addDefaultTypes(constraints);
+                }
                 var res = checkType(rules[field][prop], constraints);
                 if (!res) {
                     warn('At least one constraint of "' + prop + '" on "' + field + '" do not comply with following type constraints: ' + JSON.stringify(constraints));
