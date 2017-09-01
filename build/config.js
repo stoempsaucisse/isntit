@@ -1,8 +1,6 @@
-const path = require('path')
-const flow = require('rollup-plugin-flow-no-whitespace')
-const buble = require('rollup-plugin-buble')
-const replace = require('rollup-plugin-replace')
-const version = process.env.VERSION || require('../package.json').version
+const path = require('path');
+const replace = require('rollup-plugin-replace');
+const version = process.env.VERSION || require('../package.json').version;
 const firstYear = 2016;
 const year = new Date().getFullYear();
 
@@ -12,47 +10,78 @@ const banner =
   ' * version: ' + version + '\n' +
   ' * (c) ' + firstYear + ((firstYear == year)? '' : '-' + year) + ' stoempsaucisse\n' +
   ' * Released under the MIT License.\n' +
-  ' */\n'
-
-// const baseAlias = require('./alias')
+  ' */\n';
 
 const builds = {
   // Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
-  'web-standalone-dev': {
+  'isntit-dev': {
     entry: path.resolve(__dirname, '../src/entries/development.js'),
     dest: path.resolve(__dirname, '../dist/isntit.js'),
     format: 'umd',
     env: 'development',
-    banner
+    banner,
+    moduleName: 'isntit'
   },
-  'web-standalone-prod': {
-    entry: path.resolve(__dirname, '../src/entries/production.js'),
-    dest: path.resolve(__dirname, '../dist/isntit.min.js'),
+  // Bag Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
+  'test': {
+    entry: path.resolve(__dirname, '../src/entries/test.js'),
+    dest: path.resolve(__dirname, '../dist/test.js'),
     format: 'umd',
-    env: 'production',
-    banner
+    env: 'development',
+    banner,
+    moduleName: 'test'
   },
-  'web-runtime-dev': {
-    entry: path.resolve(__dirname, '../src/index.js'),
-    dest: path.resolve(__dirname, '../dist/isntit.common.js'),
-    format: 'cjs',
-    banner
+  // Message Bag Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
+  // 'messageBag-dev': {
+  //   entry: path.resolve(__dirname, '../src/entries/messageBag.js'),
+  //   dest: path.resolve(__dirname, '../dist/messageBag.js'),
+  //   format: 'umd',
+  //   env: 'development',
+  //   banner,
+  //   moduleName: 'messageBag'
+  // },
+  // // Bag Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
+  // 'bag-dev': {
+  //   entry: path.resolve(__dirname, '../src/entries/bag.js'),
+  //   dest: path.resolve(__dirname, '../dist/bag.js'),
+  //   format: 'umd',
+  //   env: 'development',
+  //   banner,
+  //   moduleName: 'bag'
+  // },
+  // Bag Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
+  'validator-dev': {
+    entry: path.resolve(__dirname, '../src/entries/validator.js'),
+    dest: path.resolve(__dirname, '../dist/validator.js'),
+    format: 'umd',
+    env: 'development',
+    banner,
+    moduleName: 'validator'
+  },
+  // Bag Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
+  'validators-dev': {
+    entry: path.resolve(__dirname, '../src/entries/validators.js'),
+    dest: path.resolve(__dirname, '../dist/validators.js'),
+    format: 'umd',
+    env: 'development',
+    banner,
+    moduleName: 'validators'
   }
-}
+};
 
-function genConfig (opts) {
+var genConfig = function (opts) {
   const config = {
     entry: opts.entry,
     dest: opts.dest,
     external: opts.external,
     format: opts.format,
     banner: opts.banner,
-    moduleName: 'Isntit',
-    plugins: [
+    moduleName: opts.moduleName,
+    plugins: [/*
       flow(),
-      buble()
+      buble()/**/
     ]/**/
-  }
+    };
 
   if (opts.env) {
     config.plugins.push(replace({
@@ -63,14 +92,14 @@ function genConfig (opts) {
       "'process.env.NODE_ENV'": 'process.env.NODE_ENV'
     }))
 
-  }
+  };
 
-  return config
-}
+  return config;
+};
 
 if (process.env.TARGET) {
   module.exports = genConfig(builds[process.env.TARGET])
 } else {
   exports.getBuild = name => genConfig(builds[name])
   exports.getAllBuilds = () => Object.keys(builds).map(name => genConfig(builds[name]))
-}
+};

@@ -12,9 +12,9 @@ const uglify = require('uglify-js')
 const version = process.env.VERSION || require('../package.json').version
 // Update main file
 const main = fs
-  .readFileSync('src/index.js', 'utf-8')
-  .replace(/Isntit\.version = '[^']+'/, "Isntit.version = '" + version + "'")
-fs.writeFileSync('src/index.js', main)
+  .readFileSync('src/isntit.js', 'utf-8')
+  .replace(/my\.appVersion = '[^']+'/, "my\.appVersion = '" + version + "'")
+fs.writeFileSync('src/isntit.js', main)
 
 let builds = require('./config').getAllBuilds()
 
@@ -45,32 +45,42 @@ function build (builds) {
 
 function buildEntry (config) {
   const isProd = /min\.js$/.test(config.dest)
-  return rollup.rollup(config).then(bundle => {
-    const code = bundle.generate(config).code
-    if (isProd) {
-      var minified = (config.banner ? config.banner + '\n' : '') + uglify.minify(code, {
-        fromString: true,
-        output: {
-          screw_ie8: true,
-          ascii_only: true
-        },
-        compress: {
-          pure_funcs: ['makeMap']
-        }
-      }).code
-      return write(config.dest, minified).then(zip(config.dest))
-    } else {
-      return write(config.dest, code)
-    }
-  })
+  return rollup.rollup(config)
+    .then(bundle => bundle.generate(config))
+    .then(({ code }) => {
+      if (isProd) {
+        var minified = (config.banner ? config.banner + '\n' : '') + uglify.minify(code, {
+          output: {
+            ascii_only: true
+          },
+          compress: {
+            pure_funcs: ['makeMap']
+          }
+        }).code
+        return write(config.dest, minified, true)
+      } else {
+        return write(config.dest, code)
+      }
+    })
 }
 
-function write (dest, code) {
-  return new Promise(function (resolve, reject) {
-    fs.writeFile(dest, code, function (err) {
-      if (err) return reject(err)
-      console.log(blue(path.relative(process.cwd(), dest)) + ' ' + getSize(code))
+function write (dest, code, zip) {
+  return new Promise((resolve, reject) => {
+    function report (extra) {
+      console.log(blue(path.relative(process.cwd(), dest)) + ' ' + getSize(code) + (extra || ''))
       resolve()
+    }
+
+    fs.writeFile(dest, code, err => {
+      if (err) return reject(err)
+      if (zip) {
+        zlib.gzip(code, (err, zipped) => {
+          if (err) return reject(err)
+          report(' (gzipped: ' + getSize(zipped) + ')')
+        })
+      } else {
+        report()
+      }
     })
   })
 }

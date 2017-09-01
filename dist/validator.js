@@ -8,7 +8,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
-	(global.isntit = factory());
+	(global.validator = factory());
 }(this, (function () { 'use strict';
 
 var baseObject = function (config, my, that) {
@@ -209,47 +209,47 @@ var checksTypes = function (config, my, that) {
 
 function Validation$1 () {}
 
-function Failure$2 (a) {
+function Failure$1 (a) {
     this.value = a;
 }
-Failure$2.prototype = Object.create(Validation$1.prototype);
-function Success$2 (a) {
+Failure$1.prototype = Object.create(Validation$1.prototype);
+function Success$1 (a) {
     this.value = a;
 }
-Success$2.prototype = Object.create(Validation$1.prototype);
+Success$1.prototype = Object.create(Validation$1.prototype);
 
 Validation$1.Failure = function (a) {
-    return new Failure$2(a);
+    return new Failure$1(a);
 };
 Validation$1.prototype.Failure = Validation$1.Failure;
 Validation$1.Success = function (a) {
-    return new Success$2(a);
+    return new Success$1(a);
 };
 Validation$1.prototype.Success = Validation$1.Success;
 
 Validation$1.prototype.isFailure = false;
-Failure$2.prototype.isFailure = true;
+Failure$1.prototype.isFailure = true;
 Validation$1.prototype.isSuccess = false;
-Success$2.prototype.isSuccess = true;
+Success$1.prototype.isSuccess = true;
 
 // End of Copyright (c) 2013-2014 Quildreen Motta <quildreen@gmail.com>
 
-Failure$2.prototype.concat = function (aValidation) {
+Failure$1.prototype.concat = function (aValidation) {
     // this.isFailure + aValidation.isSuccess
     // return the Failure
     return aValidation.isSuccess ?
         this.Failure(this.value) :
         this.Failure(this.value.concat(aValidation.value));
 };
-Success$2.prototype.concat = function (aValidation) {
+Success$1.prototype.concat = function (aValidation) {
     return aValidation.isSuccess ?
         this.Success(aValidation.value) :
         this.Failure(aValidation.value) ;
 };
 
-var Success$1 = Validation$1.Success;
+var Success = Validation$1.Success;
 
-var validator = function (config, my, that) {
+var validator$1 = function (config, my, that) {
     config = config || {};
     my = my || {};
     that = that || {};
@@ -392,7 +392,7 @@ var validator = function (config, my, that) {
             my.throwError('Error', 'No data to validate!');
         }
 
-        result = Success$1();
+        result = Success();
         if (only !== undefined) {
             validateOnly();
         } else {
@@ -444,57 +444,6 @@ var validator = function (config, my, that) {
     return that;
 };
 
-var app = function(config, my, that) {
-    config = config || {};
-    my = my || {};
-    that = that || {};
-
-    // Depending on baseObject for my.has
-    baseObject(config, my, that);
-
-    // Checking if "that" object already has app activated
-    if (my.has.app !== true) {
-        my.has.app = true;
-
-        var getName,
-            getVersion;
-
-        getName = function () { return my.appName; };
-        that.getName = getName;
-        getVersion = function () { return my.appVersion; };
-        that.getVersion = getVersion;
-    }
-
-    return that;
-};
-
-var Failure = Validation$1.Failure;
-var Success = Validation$1.Success;
-
-var isntit$1 = function (config, constraintsSet) {
-    var my = {},
-        that = validator(config, my);
-
-    my.appName = 'isntit';
-    my.appVersion = '2.0.0';
-    app(config, my, that);
-    that.version = that.getVersion();
-    that.name = that.getName();
-
-    // Boot isntit object.
-    if (constraintsSet !== undefined) {
-        that.setConstraints(constraintsSet);
-    }
-
-    return that;
-};
-
-// Give acces to validator function from within browser
-isntit$1.validator = validator;
-
-isntit$1.Success = Success;
-isntit$1.Failure = Failure;
-
-return isntit$1;
+return validator$1;
 
 })));
